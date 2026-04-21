@@ -28,6 +28,8 @@ body {
     radial-gradient(circle at 92% 90%, rgba(143, 164, 154, 0.3), transparent 44%),
     linear-gradient(150deg, #f5f9f7 0%, #fdfefd 45%, #f5f9f7 100%);
   min-height: 100vh;
+  scrollbar-gutter: stable;
+  overflow-y: scroll;
 }
 
 #root {
@@ -75,16 +77,31 @@ a {
   border-radius: 999px;
   font-size: 0.94rem;
   color: var(--ink-muted);
+  transition:
+    background-color 0.22s ease,
+    color 0.22s ease,
+    transform 0.22s ease,
+    box-shadow 0.22s ease;
+  will-change: transform;
+}
+
+.nav-link:hover {
+  transform: translateY(-1px);
 }
 
 .nav-link.active {
   background: var(--accent);
   color: var(--ink);
+  box-shadow: inset 0 0 0 1px rgba(143, 164, 154, 0.35);
+  animation: nav-activate 0.24s ease;
 }
 
 .page {
   margin-top: 2.4rem;
-  animation: fade-in 0.45s ease;
+}
+
+.page-transition {
+  animation: page-switch-in 0.32s ease;
 }
 
 .hero {
@@ -238,6 +255,38 @@ h1 {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes page-switch-in {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes nav-activate {
+  0% {
+    transform: scale(0.97);
+  }
+  70% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-link,
+  .nav-link.active,
+  .page-transition {
+    animation: none;
+    transition: none;
   }
 }
 

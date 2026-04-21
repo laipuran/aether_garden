@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
 
 const navItems = [
   { to: '/', label: '主页', end: true },
@@ -8,6 +8,8 @@ const navItems = [
 ]
 
 export function Layout() {
+  const location = useLocation()
+
   return (
     <div className="site-shell">
       <header className="site-nav">
@@ -29,7 +31,9 @@ export function Layout() {
       </header>
 
       <main className="page">
-        <Outlet />
+        <div key={location.pathname} className="page-transition">
+          <Outlet />
+        </div>
       </main>
 
       <footer className="site-footer">
