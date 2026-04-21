@@ -10,9 +10,11 @@ export function NotesPage() {
 
   return (
     <section className="section">
-      <div className="eyebrow">Notes</div>
-      <h1>随笔</h1>
-      <p className="lead">简短但真实的记录，可能是一句感想，也可能是一个正在萌芽的点子。</p>
+      <header className="page-header">
+        <div className="eyebrow">Notes</div>
+        <h1>随笔</h1>
+        <p className="lead">简短但真实的记录，可能是一句感想，也可能是一个正在萌芽的点子。</p>
+      </header>
 
       {loading ? <p className="status">正在加载随笔列表...</p> : null}
       {error ? <p className="status">随笔列表加载失败。</p> : null}

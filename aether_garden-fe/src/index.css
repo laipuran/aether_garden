@@ -24,6 +24,14 @@
     Monaco,
     Consolas,
     monospace;
+
+  --space-1: 0.5rem;
+  --space-2: 0.75rem;
+  --space-3: 1rem;
+  --space-4: 1.5rem;
+  --space-5: 2rem;
+  --space-6: 2.5rem;
+  --space-7: 3rem;
 }
 
 * {
@@ -55,19 +63,19 @@ a {
 .site-shell {
   max-width: 1120px;
   margin: 0 auto;
-  padding: 2rem 1.4rem 4rem;
+  padding: var(--space-5) var(--space-4) var(--space-7);
 }
 
 .site-nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 1rem;
+  gap: var(--space-3);
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.74);
   backdrop-filter: blur(6px);
   border-radius: 20px;
-  padding: 0.85rem 1.1rem;
+  padding: var(--space-2) var(--space-3);
   box-shadow: var(--shadow);
 }
 
@@ -79,12 +87,12 @@ a {
 
 .nav-links {
   display: flex;
-  gap: 0.75rem;
+  gap: var(--space-2);
   flex-wrap: wrap;
 }
 
 .nav-link {
-  padding: 0.45rem 0.9rem;
+  padding: var(--space-1) var(--space-3);
   border-radius: 999px;
   font-size: 0.94rem;
   color: var(--ink-muted);
@@ -108,7 +116,7 @@ a {
 }
 
 .page {
-  margin-top: 2.4rem;
+  margin-top: var(--space-6);
 }
 
 .page-transition {
@@ -116,11 +124,11 @@ a {
 }
 
 .hero {
-  min-height: 56vh;
+  min-height: clamp(22rem, 56vh, 34rem);
   display: grid;
   align-content: center;
-  gap: 1.5rem;
-  padding: 2rem 0;
+  gap: var(--space-4);
+  padding: var(--space-4) 0;
 }
 
 .eyebrow {
@@ -141,31 +149,37 @@ h3 {
 
 h1 {
   font-size: clamp(2rem, 3.6vw, 3.8rem);
+}
+
+.hero-title {
   max-width: 18ch;
 }
 
 .lead {
-  max-width: 56ch;
+  max-width: 60ch;
   color: var(--ink-muted);
   line-height: 1.78;
 }
 
+.hero-lead {
+  max-width: 56ch;
+}
+
 .entry-grid {
-  margin-top: 1.7rem;
+  margin-top: var(--space-4);
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
+  gap: var(--space-3);
 }
 
 .entry-card {
   border: 1px solid var(--line);
   border-radius: 20px;
   background: var(--surface-elevated);
-  padding: 1.2rem;
-  min-height: 164px;
+  padding: var(--space-4);
   display: grid;
   align-content: space-between;
-  gap: 1rem;
+  gap: var(--space-3);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
@@ -189,35 +203,44 @@ h1 {
   font-size: 0.82rem;
   color: #3f534b;
   background: rgba(196, 213, 203, 0.5);
-  padding: 0.2rem 0.55rem;
+  padding: 0.2rem var(--space-2);
   border-radius: 999px;
 }
 
 .section {
-  margin-top: 2.2rem;
-  padding: 1.4rem;
+  margin-top: var(--space-5);
+  padding: var(--space-4);
   border: 1px solid var(--line);
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.8);
 }
 
+.github-overview-content {
+  min-height: 23.5rem;
+}
+
+.page-header {
+  display: grid;
+  gap: var(--space-3);
+}
+
 .list {
-  margin: 1rem 0 0;
+  margin: var(--space-4) 0 0;
   padding: 0;
   list-style: none;
   display: grid;
-  gap: 0.75rem;
+  gap: var(--space-2);
 }
 
 .list-item {
   border: 1px solid var(--line);
   border-radius: 14px;
   background: var(--surface);
-  padding: 0.9rem;
+  padding: var(--space-3);
 }
 
 .meta {
-  margin-top: 0.3rem;
+  margin-top: var(--space-1);
   color: var(--ink-muted);
   font-size: 0.9rem;
 }
@@ -226,16 +249,19 @@ h1 {
   border: 1px solid var(--line);
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.86);
-  padding: 1.5rem;
+  padding: var(--space-4);
 }
 
-.article p {
+.article-body {
+  margin-top: var(--space-4);
+  display: grid;
+  gap: var(--space-3);
+}
+
+.article-body p {
+  margin: 0;
   line-height: 1.82;
   color: #2e3e39;
-}
-
-.article p + p {
-  margin-top: 1rem;
 }
 
 .markdown-body {
@@ -262,7 +288,7 @@ h1 {
 .markdown-body h2,
 .markdown-body h3,
 .markdown-body h4 {
-  margin: 1.5rem 0 0.75rem;
+  margin: var(--space-4) 0 var(--space-2);
   color: var(--ink);
 }
 
@@ -279,8 +305,8 @@ h1 {
 }
 
 .markdown-body blockquote {
-  margin: 1rem 0;
-  padding: 0.75rem 1rem;
+  margin: var(--space-3) 0;
+  padding: var(--space-2) var(--space-3);
   border-left: 3px solid var(--accent-deep);
   background: rgba(196, 213, 203, 0.2);
   border-radius: 0 12px 12px 0;
@@ -312,7 +338,7 @@ h1 {
 }
 
 .markdown-body pre {
-  margin: 1rem 0;
+  margin: var(--space-3) 0;
   background: #eff5f1;
   border: 1px solid var(--line);
   border-radius: 14px;
@@ -330,13 +356,13 @@ h1 {
   display: block;
   max-width: 100%;
   height: auto;
-  margin: 1rem 0;
+  margin: var(--space-3) 0;
   border-radius: 12px;
 }
 
 .markdown-body table {
   width: 100%;
-  margin: 1rem 0;
+  margin: var(--space-3) 0;
   border-collapse: collapse;
   display: block;
   overflow-x: auto;
@@ -356,7 +382,12 @@ h1 {
 }
 
 .article-header {
-  margin-bottom: 1.2rem;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.article-header + .markdown-body {
+  margin-top: var(--space-4);
 }
 
 .mono {
@@ -365,12 +396,44 @@ h1 {
 
 .status {
   color: var(--ink-muted);
-  padding: 1.1rem 0;
+  padding: var(--space-3) 0;
+}
+
+.skeleton-item {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.skeleton {
+  border-radius: 8px;
+  background: linear-gradient(
+    90deg,
+    rgba(216, 227, 221, 0.6) 0%,
+    rgba(233, 240, 236, 0.95) 45%,
+    rgba(216, 227, 221, 0.6) 100%
+  );
+  background-size: 220% 100%;
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+.skeleton-title {
+  width: 42%;
+  height: 1.2rem;
+}
+
+.skeleton-text {
+  width: 75%;
+  height: 0.95rem;
+}
+
+.skeleton-meta {
+  width: 32%;
+  height: 0.9rem;
 }
 
 .site-footer {
-  margin-top: 2.3rem;
-  padding: 1.2rem 0 0.4rem;
+  margin-top: var(--space-5);
+  padding: var(--space-4) 0 var(--space-1);
   color: var(--ink-muted);
   font-size: 0.9rem;
 }
@@ -397,6 +460,15 @@ h1 {
   }
 }
 
+@keyframes skeleton-pulse {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
 @keyframes nav-activate {
   0% {
     transform: scale(0.97);
@@ -420,7 +492,7 @@ h1 {
 
 @media (max-width: 900px) {
   .entry-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .site-nav {
@@ -429,7 +501,15 @@ h1 {
   }
 
   .hero {
-    min-height: 42vh;
+    min-height: clamp(20rem, 50vh, 30rem);
+  }
+
+  .site-shell {
+    padding: var(--space-4) var(--space-3) var(--space-6);
+  }
+
+  .github-overview-content {
+    min-height: 22rem;
   }
 
   .markdown-body pre {
@@ -439,5 +519,20 @@ h1 {
   .markdown-body th,
   .markdown-body td {
     font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 680px) {
+  .entry-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section,
+  .article {
+    padding: var(--space-3);
+  }
+
+  .github-overview-content {
+    min-height: 20rem;
   }
 }

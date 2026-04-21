@@ -22,27 +22,29 @@ export function AboutPage() {
         <p className="lead">{data.title}</p>
       </header>
 
-      <p>{data.bio}</p>
-      <p>
-        学校：<span className="mono">{data.school}</span>，常驻：
-        <span className="mono">{data.location}</span>。
-      </p>
-      <p>兴趣方向：{data.interests.join('、')}。</p>
-      <p>
-        GitHub：
-        <a href={data.github} target="_blank" rel="noreferrer" className="mono">
-          {data.github}
-        </a>
-      </p>
-      <p>
-        网站：
-        <a href={data.website} target="_blank" rel="noreferrer" className="mono">
-          {data.website}
-        </a>
-      </p>
-      <p>
-        联系方式：<span className="mono">{data.contactEmail}</span>
-      </p>
+      <div className="article-body">
+        <p>{data.bio}</p>
+        <p>
+          学校：<span className="mono">{data.school}</span>，常驻：
+          <span className="mono">{data.location}</span>。
+        </p>
+        <p>兴趣方向：{data.interests.join('、')}。</p>
+        <p>
+          GitHub：
+          <a href={data.github} target="_blank" rel="noreferrer" className="mono">
+            {data.github}
+          </a>
+        </p>
+        <p>
+          网站：
+          <a href={data.website} target="_blank" rel="noreferrer" className="mono">
+            {data.website}
+          </a>
+        </p>
+        <p>
+          联系方式：<span className="mono">{data.contactEmail}</span>
+        </p>
+      </div>
     </section>
   )
 }

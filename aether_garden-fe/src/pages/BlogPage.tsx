@@ -10,9 +10,11 @@ export function BlogPage() {
 
   return (
     <section className="section">
-      <div className="eyebrow">Blog</div>
-      <h1>博客</h1>
-      <p className="lead">这里放项目复盘、学习记录和较完整的技术文章。</p>
+      <header className="page-header">
+        <div className="eyebrow">Blog</div>
+        <h1>博客</h1>
+        <p className="lead">这里放项目复盘、学习记录和较完整的技术文章。</p>
+      </header>
 
       {loading ? <p className="status">正在加载博客列表...</p> : null}
       {error ? <p className="status">博客列表加载失败。</p> : null}
