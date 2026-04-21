@@ -1,0 +1,26 @@
+name: Trigger website content reload
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "content/blog/**"
+      - "content/notes/**"
+
+jobs:
+  reload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger website backend reload
+        env:
+          WEBSITE_RELOAD_URL: ${{ secrets.WEBSITE_RELOAD_URL }}
+          WEBSITE_RELOAD_TOKEN: ${{ secrets.WEBSITE_RELOAD_TOKEN }}
+        run: |
+          curl -sS -X POST "$WEBSITE_RELOAD_URL" \
+            -H "X-Reload-Token: $WEBSITE_RELOAD_TOKEN" \
+            -H "Content-Type: application/json" \
+            --retry 3 \
+            --retry-delay 2 \
+            --retry-connrefused \
+            --fail

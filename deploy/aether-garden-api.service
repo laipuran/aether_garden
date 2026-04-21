@@ -1,0 +1,17 @@
+[Unit]
+Description=Aether Garden Backend API
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/aether_garden/aether_garden/publish/aether_garden-be
+ExecStart=/opt/aether_garden/aether_garden/publish/aether_garden-be/aether_garden-be
+Restart=always
+RestartSec=5
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=ASPNETCORE_URLS=http://127.0.0.1:5109
+User=www-data
+Group=www-data
+
+[Install]
+WantedBy=multi-user.target
