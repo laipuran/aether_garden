@@ -6,6 +6,7 @@ public record PostDetail(
     string Excerpt,
     string Date,
     List<string> Tags,
+    string Markdown,
     List<string> Content
 )
 {

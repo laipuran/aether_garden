@@ -148,6 +148,7 @@ public class MarkdownContentService : IContentProvider, IContentReloadService
             Excerpt: excerpt,
             Date: metadata.Date.Trim(),
             Tags: (metadata.Tags ?? []).Where(tag => !string.IsNullOrWhiteSpace(tag)).Select(tag => tag.Trim()).ToList(),
+            Markdown: body,
             Content: paragraphs
         );
 

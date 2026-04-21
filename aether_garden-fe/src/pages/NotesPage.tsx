@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { api } from '../api'
+import { MarkdownContent } from '../components/MarkdownContent'
 import { useLoadable } from '../hooks/useLoadable'
 
 export function NotesPage() {
@@ -55,9 +56,7 @@ export function NoteDetailPage() {
           {data.date} · {data.tags.join(' / ')}
         </div>
       </header>
-      {data.content.map((paragraph, index) => (
-        <p key={`${data.slug}-${index}`}>{paragraph}</p>
-      ))}
+      <MarkdownContent markdown={data.markdown} fallbackParagraphs={data.content} />
     </article>
   )
 }

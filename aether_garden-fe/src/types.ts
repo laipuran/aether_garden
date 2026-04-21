@@ -19,6 +19,7 @@ export type PostSummary = {
 }
 
 export type PostDetail = PostSummary & {
+  markdown: string
   content: string[]
 }
 
