@@ -1,0 +1,84 @@
+name: Manual Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Git ref to deploy (branch, tag, or commit SHA)"
+        required: false
+        default: "main"
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+      DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+      DEPLOY_PORT: ${{ secrets.DEPLOY_PORT || '22' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Build frontend
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build
+        working-directory: aether_garden-fe
+        env:
+          VITE_API_BASE_URL: https://duckran.top/api
+
+      - name: Publish backend
+        run: |
+          dotnet publish ./aether_garden-be -c Release -r linux-x64 --self-contained true -o ./out/backend
+
+      - name: Pack artifacts
+        run: |
+          mkdir -p out
+          tar -czf out/backend-publish.tar.gz -C out/backend .
+          tar -czf out/frontend-dist.tar.gz -C aether_garden-fe/dist .
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -p "$DEPLOY_PORT" "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Upload release artifacts
+        env:
+          RELEASE_DIR: /tmp/aether_release/${{ github.run_id }}-${{ github.sha }}
+        run: |
+          ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "mkdir -p '$RELEASE_DIR'"
+          scp -P "$DEPLOY_PORT" out/backend-publish.tar.gz "$DEPLOY_USER@$DEPLOY_HOST:$RELEASE_DIR/backend-publish.tar.gz"
+          scp -P "$DEPLOY_PORT" out/frontend-dist.tar.gz "$DEPLOY_USER@$DEPLOY_HOST:$RELEASE_DIR/frontend-dist.tar.gz"
+          scp -P "$DEPLOY_PORT" deploy/deploy.sh "$DEPLOY_USER@$DEPLOY_HOST:$RELEASE_DIR/deploy.sh"
+
+      - name: Run remote deployment
+        env:
+          RELEASE_DIR: /tmp/aether_release/${{ github.run_id }}-${{ github.sha }}
+        run: |
+          ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "chmod +x '$RELEASE_DIR/deploy.sh' && '$RELEASE_DIR/deploy.sh' '$RELEASE_DIR'"

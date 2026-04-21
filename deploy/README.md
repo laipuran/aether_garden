@@ -8,6 +8,8 @@ This directory contains ready-to-copy templates for production deployment.
 - `nginx.duckran.top.conf`: Nginx site config for frontend + backend reverse proxy
 - `appsettings.Production.json`: backend production config template
 - `content-reload.workflow.yml`: GitHub Actions workflow to place in `aether_garden.content`
+- `deploy.sh`: server-side deployment script used by CI/CD
+- `.github/workflows/manual-deploy.yml`: manual production deployment workflow in `aether_garden`
 
 ## Server layout (your target)
 
@@ -83,7 +85,27 @@ In repo `aether_garden.content`:
    - `WEBSITE_RELOAD_URL`: `https://duckran.top/internal/content/reload`
    - `WEBSITE_RELOAD_TOKEN`: must match backend `InternalAuth.ReloadToken`
 
-## 8) Verify
+## 8) Configure manual deploy CI/CD (`aether_garden` repo)
+
+Create GitHub repository environment `production` and add these secrets:
+
+- `DEPLOY_HOST`: server host (IP or domain)
+- `DEPLOY_USER`: ssh user for deployment
+- `DEPLOY_SSH_KEY`: private key for `DEPLOY_USER`
+- `DEPLOY_PORT`: optional, default `22`
+
+Workflow file is already prepared at:
+
+- `.github/workflows/manual-deploy.yml`
+
+How it works:
+
+1. You trigger workflow manually (`Run workflow`) and select ref.
+2. GitHub Actions builds frontend/backend artifacts.
+3. Artifacts and `deploy/deploy.sh` are uploaded to server temp directory.
+4. Remote script installs artifacts, restarts backend service, reloads Nginx, and runs a local health check.
+
+## 9) Verify
 
 ```bash
 curl -i https://duckran.top/api/blog
