@@ -10,6 +10,9 @@ RELEASE_DIR="$1"
 BACKEND_TARGET="/opt/aether_garden/aether_garden/publish/aether_garden-be"
 FRONTEND_TARGET="/var/www/aether-garden"
 SERVICE_NAME="aether-garden-api"
+HEALTH_URL="http://127.0.0.1:5109/api/blog"
+HEALTH_RETRIES=30
+HEALTH_SLEEP_SECONDS=2
 
 BACKEND_TAR="$RELEASE_DIR/backend-publish.tar.gz"
 FRONTEND_TAR="$RELEASE_DIR/frontend-dist.tar.gz"
@@ -48,6 +51,21 @@ sudo systemctl restart "$SERVICE_NAME"
 sudo nginx -t
 sudo systemctl reload nginx
 
-curl -fsS "http://127.0.0.1:5109/api/blog" >/dev/null
+healthy=false
+for ((i = 1; i <= HEALTH_RETRIES; i++)); do
+  if curl -fsS "$HEALTH_URL" >/dev/null; then
+    healthy=true
+    break
+  fi
+
+  sleep "$HEALTH_SLEEP_SECONDS"
+done
+
+if [[ "$healthy" != "true" ]]; then
+  echo "Health check failed after $HEALTH_RETRIES attempts: $HEALTH_URL"
+  sudo systemctl status "$SERVICE_NAME" --no-pager -l || true
+  sudo journalctl -u "$SERVICE_NAME" -n 120 --no-pager || true
+  exit 1
+fi
 
 echo "Deployment completed successfully."

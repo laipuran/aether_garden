@@ -61,10 +61,19 @@ jobs:
 
       - name: Configure SSH
         run: |
+          set -euo pipefail
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
-          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+
+          KEY_MATERIAL="${{ secrets.DEPLOY_SSH_KEY }}"
+          if [[ "$KEY_MATERIAL" == *"BEGIN OPENSSH PRIVATE KEY"* || "$KEY_MATERIAL" == *"BEGIN RSA PRIVATE KEY"* || "$KEY_MATERIAL" == *"BEGIN EC PRIVATE KEY"* || "$KEY_MATERIAL" == *"BEGIN PRIVATE KEY"* ]]; then
+            printf '%s\n' "$KEY_MATERIAL" | tr -d '\r' > ~/.ssh/id_ed25519
+          else
+            printf '%s' "$KEY_MATERIAL" | tr -d '\r' | base64 -d > ~/.ssh/id_ed25519
+          fi
+
           chmod 600 ~/.ssh/id_ed25519
+          ssh-keygen -y -f ~/.ssh/id_ed25519 >/dev/null
           ssh-keyscan -p "$DEPLOY_PORT" "$DEPLOY_HOST" >> ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
 
