@@ -207,7 +207,7 @@ public class MarkdownContentService : IContentProvider, IContentReloadService
     private static string BuildExcerpt(string markdownBody)
     {
         var plain = MarkdownBlockToPlainText(markdownBody);
-        return plain.Length <= 120 ? plain : $"{plain[..120].TrimEnd()}...";
+        return plain.Length <= 60 ? plain : $"{plain[..60].TrimEnd()}...";
     }
 
     private static string MarkdownBlockToPlainText(string markdown)
