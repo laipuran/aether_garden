@@ -2,6 +2,7 @@ using aether_garden_be.Modules;
 using aether_garden_be.Options;
 using aether_garden_be.Services.Content;
 using aether_garden_be.Services.Github;
+using aether_garden_be.Services.Music;
 using aether_garden_be.Services.Profile;
 using Microsoft.Extensions.Options;
 
@@ -15,6 +16,7 @@ builder.Services.Configure<GithubOptions>(builder.Configuration.GetSection("Gith
 builder.Services.Configure<ContentOptions>(builder.Configuration.GetSection("Content"));
 builder.Services.Configure<InternalAuthOptions>(builder.Configuration.GetSection("InternalAuth"));
 builder.Services.Configure<FeatureOptions>(builder.Configuration.GetSection("Features"));
+builder.Services.Configure<AppleMusicOptions>(builder.Configuration.GetSection("AppleMusic"));
 
 var frontendOrigins = builder.Configuration
     .GetSection("Cors:AllowedOrigins")
@@ -35,11 +37,14 @@ builder.Services.AddSingleton<IContentProvider>(sp => sp.GetRequiredService<Mark
 builder.Services.AddSingleton<IContentReloadService>(sp => sp.GetRequiredService<MarkdownContentService>());
 builder.Services.AddSingleton<IProfileProvider, StaticProfileProvider>();
 builder.Services.AddSingleton<IGithubOverviewService, GithubOverviewService>();
+builder.Services.AddSingleton<IAppleMusicService, AppleMusicService>();
+builder.Services.AddSingleton<INeteaseMusicService, NeteaseMusicService>();
 
 builder.Services.AddSingleton<IEndpointModule, ProfileModule>();
 builder.Services.AddSingleton<IEndpointModule, BlogModule>();
 builder.Services.AddSingleton<IEndpointModule, NotesModule>();
 builder.Services.AddSingleton<IEndpointModule, GithubModule>();
+builder.Services.AddSingleton<IEndpointModule, MusicModule>();
 builder.Services.AddSingleton<IEndpointModule, InternalModule>();
 
 var app = builder.Build();

@@ -40,3 +40,11 @@ export type GithubOverview = {
   picked: GithubRepo[]
   source: string
 }
+
+export type AppleMusicTrack = {
+  name: string
+  artist: string
+  artworkUrl: string
+  url: string
+  neteaseUrl: string
+}

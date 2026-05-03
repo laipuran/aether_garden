@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
 import { EntryCard } from '../components/EntryCard'
+import { FavoriteTracks } from '../components/FavoriteTracks'
 import { api } from '../api'
 import { useLoadable } from '../hooks/useLoadable'
 
@@ -13,6 +14,11 @@ export function HomePage() {
   const githubState = useLoadable(loadGithub, {
     cacheKey: 'home.github-overview',
     cacheTtlMs: 10 * 60 * 1000,
+  })
+  const loadFavorites = useCallback(() => api.getAppleMusicFavorites(), [])
+  const favoritesState = useLoadable(loadFavorites, {
+    cacheKey: 'home.music-favorites',
+    cacheTtlMs: 6 * 60 * 60 * 1000,
   })
 
   return (
@@ -43,6 +49,19 @@ export function HomePage() {
             title="个人介绍"
             badge="About"
           />
+        </div>
+      </section>
+
+      <section className="section">
+        <h2>最近喜欢</h2>
+        <div className="music-section">
+          {favoritesState.loading ? (
+            <p className="status">正在加载喜欢的歌曲...</p>
+          ) : favoritesState.error ? (
+            <p className="status">暂时无法读取喜欢的歌曲。</p>
+          ) : (
+            <FavoriteTracks tracks={favoritesState.data ?? []} />
+          )}
         </div>
       </section>
 

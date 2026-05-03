@@ -57,4 +57,18 @@ Update `appsettings.json` if your frontend is hosted on another domain:
 - `GET /api/notes`
 - `GET /api/notes/{slug}`
 - `GET /api/github/overview`
+- `GET /api/music/favorites`
 - `POST /internal/content/reload` (header: `X-Reload-Token`)
+
+## Apple Music
+
+Configure a playlist URL and cache window in `appsettings.json`:
+
+```json
+"AppleMusic": {
+  "PlaylistUrl": "https://music.apple.com/cn/playlist/favorite-songs/pl.u-GPUoM8yJW1",
+  "CacheHours": 12
+}
+```
+
+The backend resolves Netease song links via the public web search endpoint and caches results.

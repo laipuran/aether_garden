@@ -343,6 +343,62 @@ h1 {
   min-height: 23.5rem;
 }
 
+.music-section {
+  margin-top: var(--space-3);
+}
+
+.music-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.music-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: var(--surface-elevated);
+  box-shadow: var(--shadow);
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.music-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-hover);
+}
+
+.music-art {
+  width: 72px;
+  height: 72px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--badge-bg);
+  display: grid;
+  place-items: center;
+}
+
+.music-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.music-art-fallback {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--badge-bg) 100%);
+}
+
+.music-title {
+  display: block;
+  font-size: 1rem;
+}
+
 .page-header {
   display: grid;
   gap: var(--space-3);
@@ -704,5 +760,9 @@ h1 {
 
   .github-overview-content {
     min-height: 20rem;
+  }
+
+  .music-grid {
+    grid-template-columns: 1fr;
   }
 }

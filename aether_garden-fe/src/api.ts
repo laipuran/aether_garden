@@ -1,4 +1,10 @@
-import type { GithubOverview, PostDetail, PostSummary, Profile } from './types'
+import type {
+  AppleMusicTrack,
+  GithubOverview,
+  PostDetail,
+  PostSummary,
+  Profile,
+} from './types'
 
 const baseUrl =
   import.meta.env.VITE_API_BASE_URL?.trim() || 'http://localhost:5109/api'
@@ -20,4 +26,5 @@ export const api = {
   getNoteBySlug: (slug: string) =>
     fetchJson<PostDetail>(`/notes/${encodeURIComponent(slug)}`),
   getGithubOverview: () => fetchJson<GithubOverview>('/github/overview'),
+  getAppleMusicFavorites: () => fetchJson<AppleMusicTrack[]>('/music/favorites'),
 }
