@@ -6,7 +6,7 @@ on:
       ref:
         description: "Git ref to deploy (branch, tag, or commit SHA)"
         required: false
-        default: "main"
+        default: "master"
 
 concurrency:
   group: production-deploy
