@@ -35,6 +35,10 @@
   --code-inline-border: rgba(143, 164, 154, 0.35);
   --code-block-bg: #eff5f1;
   --code-block-text: #22322d;
+  --code-copy-bg: rgba(255, 255, 255, 0.85);
+  --code-copy-border: rgba(143, 164, 154, 0.35);
+  --code-copy-text: #2e3e39;
+  --code-copy-shadow: 0 12px 30px rgba(95, 117, 107, 0.18);
   --table-head-bg: #eef4f0;
   --table-head-text: #30453f;
   --skeleton-1: rgba(216, 227, 221, 0.6);
@@ -98,8 +102,12 @@
   --code-inline-text: #d7e0dc;
   --code-inline-bg: rgba(90, 108, 99, 0.2);
   --code-inline-border: rgba(123, 143, 133, 0.35);
-  --code-block-bg: #202824;
+  --code-block-bg: #29332f;
   --code-block-text: #dfe6e2;
+  --code-copy-bg: rgba(33, 41, 37, 0.85);
+  --code-copy-border: rgba(123, 143, 133, 0.35);
+  --code-copy-text: #d7e0dc;
+  --code-copy-shadow: 0 12px 30px rgba(9, 12, 11, 0.48);
   --table-head-bg: #222b27;
   --table-head-text: #d6dfdb;
   --skeleton-1: rgba(46, 56, 51, 0.7);
@@ -470,6 +478,38 @@ h1 {
   border-radius: 14px;
   padding: 0.9rem 1rem;
   overflow-x: auto;
+}
+
+.code-block {
+  position: relative;
+}
+
+.code-copy {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.65rem;
+  z-index: 1;
+  border-radius: 999px;
+  border: 1px solid var(--code-copy-border);
+  background: var(--code-copy-bg);
+  color: var(--code-copy-text);
+  font-family: var(--font-code);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.28rem 0.6rem;
+  box-shadow: var(--code-copy-shadow);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+}
+
+.code-copy:hover {
+  transform: translateY(-1px);
+  color: var(--ink);
+}
+
+.code-copy:active {
+  transform: scale(0.98);
 }
 
 .markdown-body pre code {

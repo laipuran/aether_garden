@@ -1,4 +1,5 @@
-import type { CSSProperties } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
+import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import type { Components } from 'react-markdown'
 import rehypeSanitize from 'rehype-sanitize'
@@ -22,13 +23,10 @@ SyntaxHighlighter.registerLanguage('xaml', markup)
 
 const vscodeInspiredLightTheme: Record<string, CSSProperties> = {
   'pre[class*="language-"]': {
-    background: '#eff5f1',
-    color: '#24352f',
     margin: 0,
   },
   'code[class*="language-"]': {
     background: 'transparent',
-    color: '#24352f',
     fontFamily: 'var(--font-code)',
     fontSize: '0.92rem',
     lineHeight: 1.6,
@@ -78,6 +76,55 @@ const languageAliasMap: Record<string, string> = {
   xaml: 'xaml',
 }
 
+type CodeBlockProps = {
+  value: string
+  children: ReactNode
+}
+
+function CodeBlock({ value, children }: CodeBlockProps) {
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = async () => {
+    const trimmedValue = value.replace(/\n$/, '')
+
+    try {
+      await navigator.clipboard.writeText(trimmedValue)
+      setCopied(true)
+    } catch {
+      const textarea = document.createElement('textarea')
+      textarea.value = trimmedValue
+      textarea.setAttribute('readonly', '')
+      textarea.style.position = 'absolute'
+      textarea.style.left = '-9999px'
+      document.body.appendChild(textarea)
+      textarea.select()
+      const success = document.execCommand('copy')
+      document.body.removeChild(textarea)
+      if (success) {
+        setCopied(true)
+      }
+    }
+
+    if (typeof window !== 'undefined') {
+      window.setTimeout(() => setCopied(false), 1600)
+    }
+  }
+
+  return (
+    <div className="code-block">
+      <button
+        className="code-copy"
+        type="button"
+        onClick={handleCopy}
+        aria-label={copied ? 'Copied code' : 'Copy code'}
+      >
+        {copied ? 'Copied' : 'Copy'}
+      </button>
+      {children}
+    </div>
+  )
+}
+
 const markdownComponents: Components = {
   pre({ children }) {
     return <>{children}</>
@@ -99,31 +146,41 @@ const markdownComponents: Components = {
 
     if (!language) {
       return (
-        <pre>
-          <code className={className} {...props}>
-            {value.replace(/\n$/, '')}
-          </code>
-        </pre>
+        <CodeBlock value={value}>
+          <pre>
+            <code className={className} {...props}>
+              {value.replace(/\n$/, '')}
+            </code>
+          </pre>
+        </CodeBlock>
       )
     }
 
     return (
-      <SyntaxHighlighter
-        language={language}
-        style={vscodeInspiredLightTheme}
-        PreTag="pre"
-        customStyle={{
-          margin: '1rem 0',
-          border: '1px solid var(--line)',
-          borderRadius: '14px',
-          padding: '0.9rem 1rem',
-          overflowX: 'auto',
-          background: '#eff5f1',
-        }}
-        codeTagProps={{ style: { fontFamily: 'var(--font-code)' } }}
-      >
-        {value.replace(/\n$/, '')}
-      </SyntaxHighlighter>
+      <CodeBlock value={value}>
+        <SyntaxHighlighter
+          language={language}
+          style={vscodeInspiredLightTheme}
+          PreTag="pre"
+          customStyle={{
+            margin: '1rem 0',
+            border: '1px solid var(--line)',
+            borderRadius: '14px',
+            padding: '0.9rem 1rem',
+            overflowX: 'auto',
+            background: 'var(--code-block-bg)',
+            color: 'var(--code-block-text)',
+          }}
+          codeTagProps={{
+            style: {
+              fontFamily: 'var(--font-code)',
+              color: 'var(--code-block-text)',
+            },
+          }}
+        >
+          {value.replace(/\n$/, '')}
+        </SyntaxHighlighter>
+      </CodeBlock>
     )
   },
 }
