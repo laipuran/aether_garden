@@ -99,7 +99,7 @@ export function Layout() {
   return (
     <div className="site-shell">
       <header className="site-nav">
-        <div className="brand">aether_garden</div>
+        <div className="brand">aether garden</div>
         <nav className="nav-links" aria-label="主导航">
           {navItems.map((item) => (
             <NavLink
