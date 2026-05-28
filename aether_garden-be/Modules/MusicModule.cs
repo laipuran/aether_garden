@@ -12,5 +12,21 @@ public class MusicModule : IEndpointModule
         endpoints.MapGet("/api/music/favorites", async (IAppleMusicService appleMusicService, CancellationToken cancellationToken) =>
             Results.Ok(await appleMusicService.GetFavoriteTracksAsync(cancellationToken))
         );
+
+        endpoints.MapGet("/api/music/convert", async (string url, IAppleMusicService appleMusicService, CancellationToken cancellationToken) =>
+        {
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                return Results.BadRequest(new { error = "url is required" });
+            }
+
+            var track = await appleMusicService.ResolveSongAsync(url, cancellationToken);
+            if (track is null)
+            {
+                return Results.NotFound(new { error = "Song not found or conversion failed" });
+            }
+
+            return Results.Ok(track);
+        });
     }
 }
