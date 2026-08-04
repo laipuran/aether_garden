@@ -12,6 +12,10 @@ public class AppleMusicService : IAppleMusicService
         "eyJ[A-Za-z0-9_-]{10,}\\.[A-Za-z0-9_-]{10,}\\.[A-Za-z0-9_-]{10,}",
         RegexOptions.Compiled
     );
+    private static readonly Regex DevTokenAssetRegex = new(
+        "index-legacy~[A-Za-z0-9~_-]+\\.js",
+        RegexOptions.Compiled
+    );
     private static readonly Regex PlaylistIdRegex = new(
         "pl\\.[A-Za-z0-9-]+",
         RegexOptions.Compiled | RegexOptions.IgnoreCase
@@ -298,10 +302,14 @@ public class AppleMusicService : IAppleMusicService
     {
         var client = _httpClientFactory.CreateClient();
         client.DefaultRequestHeaders.UserAgent.ParseAdd("aether-garden-site");
-        var response = await client.GetAsync(
-            "https://music.apple.com/assets/index-legacy~0484eb127f.js",
-            cancellationToken
-        );
+
+        var assetUrl = await ResolveDevTokenAssetUrlAsync(client, cancellationToken);
+        if (string.IsNullOrWhiteSpace(assetUrl))
+        {
+            return null;
+        }
+
+        var response = await client.GetAsync(assetUrl, cancellationToken);
         if (!response.IsSuccessStatusCode)
         {
             return null;
@@ -310,6 +318,22 @@ public class AppleMusicService : IAppleMusicService
         var js = await response.Content.ReadAsStringAsync(cancellationToken);
         var match = JwtRegex.Match(js);
         return match.Success ? match.Value : null;
+    }
+
+    private async Task<string?> ResolveDevTokenAssetUrlAsync(
+        HttpClient client,
+        CancellationToken cancellationToken
+    )
+    {
+        var htmlResponse = await client.GetAsync("https://music.apple.com/cn", cancellationToken);
+        if (!htmlResponse.IsSuccessStatusCode)
+        {
+            return null;
+        }
+
+        var html = await htmlResponse.Content.ReadAsStringAsync(cancellationToken);
+        var match = DevTokenAssetRegex.Match(html);
+        return match.Success ? $"https://music.apple.com/assets/{match.Value}" : null;
     }
 
     private TimeSpan GetCacheTtl()
