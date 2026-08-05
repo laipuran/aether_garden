@@ -1,50 +1,8 @@
-export type Profile = {
-  name: string
-  title: string
-  bio: string
-  location: string
-  school: string
-  website: string
-  github: string
-  interests: string[]
-  contactEmail: string
-}
+import type { components } from './api/schema'
 
-export type PostSummary = {
-  slug: string
-  title: string
-  excerpt: string
-  date: string
-  tags: string[]
-}
-
-export type PostDetail = PostSummary & {
-  markdown: string
-  content: string[]
-}
-
-export type GithubRepo = {
-  name: string
-  description: string
-  url: string
-  language: string
-  stars: number
-}
-
-export type GithubOverview = {
-  username: string
-  profileUrl: string
-  publicRepos: number
-  followers: number
-  following: number
-  picked: GithubRepo[]
-  source: string
-}
-
-export type AppleMusicTrack = {
-  name: string
-  artist: string
-  artworkUrl: string
-  url: string
-  neteaseUrl: string
-}
+export type Profile = components['schemas']['Profile']
+export type PostSummary = components['schemas']['PostSummary']
+export type PostDetail = components['schemas']['PostDetail']
+export type GithubRepo = components['schemas']['GithubRepo']
+export type GithubOverview = components['schemas']['GithubOverview']
+export type MusicTrack = components['schemas']['MusicTrack']

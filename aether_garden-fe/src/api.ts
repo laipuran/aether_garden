@@ -1,5 +1,5 @@
 import type {
-  AppleMusicTrack,
+  MusicTrack,
   GithubOverview,
   PostDetail,
   PostSummary,
@@ -26,5 +26,5 @@ export const api = {
   getNoteBySlug: (slug: string) =>
     fetchJson<PostDetail>(`/notes/${encodeURIComponent(slug)}`),
   getGithubOverview: () => fetchJson<GithubOverview>('/github/overview'),
-  getAppleMusicFavorites: () => fetchJson<AppleMusicTrack[]>('/music/favorites'),
+  getAppleMusicFavorites: () => fetchJson<MusicTrack[]>('/music/favorites'),
 }

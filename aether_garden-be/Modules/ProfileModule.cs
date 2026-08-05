@@ -9,6 +9,6 @@ public class ProfileModule : IEndpointModule
 
     public void MapEndpoints(IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapGet("/api/profile", (IProfileProvider profileProvider) => Results.Ok(profileProvider.GetProfile()));
+        endpoints.MapGet("/api/profile", (IProfileProvider profileProvider) => TypedResults.Ok(profileProvider.GetProfile()));
     }
 }

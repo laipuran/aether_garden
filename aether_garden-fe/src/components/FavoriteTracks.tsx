@@ -1,7 +1,7 @@
-import type { AppleMusicTrack } from '../types'
+import type { MusicTrack } from '../types'
 
 type Props = {
-  tracks: AppleMusicTrack[]
+  tracks: MusicTrack[]
 }
 
 export function FavoriteTracks({ tracks }: Props) {
@@ -14,7 +14,7 @@ export function FavoriteTracks({ tracks }: Props) {
       {tracks.map((track) => (
         <a
           className="music-card"
-          href={track.neteaseUrl || track.url}
+          href={track.neteaseUrl || track.appleMusicUrl}
           target="_blank"
           rel="noreferrer"
           key={`${track.name}-${track.artist}`}

@@ -10,7 +10,7 @@ public class GithubModule : IEndpointModule
     public void MapEndpoints(IEndpointRouteBuilder endpoints)
     {
         endpoints.MapGet("/api/github/overview", async (IGithubOverviewService githubOverviewService, CancellationToken cancellationToken) =>
-            Results.Ok(await githubOverviewService.GetOverviewAsync(cancellationToken))
+            TypedResults.Ok(await githubOverviewService.GetOverviewAsync(cancellationToken))
         );
     }
 }

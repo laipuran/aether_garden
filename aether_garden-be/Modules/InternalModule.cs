@@ -35,7 +35,7 @@ public class InternalModule : IEndpointModule
 
             var result = await contentReloadService.ReloadAsync(cancellationToken);
             return Results.Ok(result);
-        });
+        }).Produces<ContentReloadResult>(200).Produces(401).Produces(503);
     }
 
     private static bool SecureEquals(string left, string right)

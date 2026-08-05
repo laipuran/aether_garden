@@ -1,3 +1,4 @@
+using aether_garden_be.Models;
 using aether_garden_be.Options;
 using aether_garden_be.Services.Content;
 
@@ -9,12 +10,16 @@ public class BlogModule : IEndpointModule
 
     public void MapEndpoints(IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapGet("/api/blog", (IContentProvider contentProvider) => Results.Ok(contentProvider.GetBlogs()));
+        endpoints.MapGet("/api/blog", (IContentProvider contentProvider) => TypedResults.Ok(contentProvider.GetBlogs()));
 
         endpoints.MapGet("/api/blog/{slug}", (string slug, IContentProvider contentProvider) =>
         {
             var post = contentProvider.GetBlogBySlug(slug);
-            return post is null ? Results.NotFound() : Results.Ok(post);
-        });
+            if (post is null)
+            {
+                return Results.NotFound();
+            }
+            return Results.Ok(post);
+        }).Produces<PostDetail>(200).Produces(404);
     }
 }
