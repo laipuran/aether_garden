@@ -72,7 +72,7 @@ public class AppleMusicService : IAppleMusicService
         return cached?.Tracks ?? [];
     }
 
-    private static async Task<T?> RefreshIfStaleAsync<T>(
+    internal static async Task<T?> RefreshIfStaleAsync<T>(
         Func<T?> read,
         Func<T, bool> isValid,
         Func<CancellationToken, Task<T?>> refresh,
@@ -357,7 +357,7 @@ public class AppleMusicService : IAppleMusicService
         return new CachedDevToken(match.Value, expiresAt);
     }
 
-    private static DateTimeOffset? DecodeExpiry(string jwt)
+    internal static DateTimeOffset? DecodeExpiry(string jwt)
     {
         var payload = jwt.Split('.')[1];
         var base64 = payload.Replace('-', '+').Replace('_', '/');

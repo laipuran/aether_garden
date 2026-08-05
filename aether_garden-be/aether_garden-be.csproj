@@ -11,6 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="aether_garden-be.Tests" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.10" />
     <PackageReference Include="Microsoft.Extensions.ApiDescription.Server" Version="10.0.0">
       <PrivateAssets>all</PrivateAssets>
