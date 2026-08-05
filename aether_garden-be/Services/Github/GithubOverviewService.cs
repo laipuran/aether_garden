@@ -96,6 +96,7 @@ public class GithubOverviewService : IGithubOverviewService
             Source: "fallback"
         );
 
+    // Mirror the JSON of the GitHub REST API (api.github.com), hence snake_case.
     private record GithubUserDto(
         string login,
         string html_url,

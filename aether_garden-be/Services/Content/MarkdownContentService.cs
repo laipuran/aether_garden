@@ -228,6 +228,8 @@ public class MarkdownContentService : IContentProvider, IContentReloadService
         public static ContentSnapshot Empty { get; } = new([], []);
     }
 
+    // Maps the YAML front matter of a content file. Status decides whether the
+    // entry is served: only "published" files are kept.
     private record PostFrontMatter
     {
         public string Slug { get; init; } = string.Empty;
