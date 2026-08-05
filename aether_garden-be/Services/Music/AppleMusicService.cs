@@ -56,7 +56,7 @@ public class AppleMusicService : IAppleMusicService
     )
     {
         var cached = await RefreshIfStaleAsync(
-            _cache,
+            () => _cache,
             cache => cache.Tracks.Count > 0 && DateTimeOffset.UtcNow < cache.ExpiresAt,
             async ct =>
             {
@@ -73,7 +73,7 @@ public class AppleMusicService : IAppleMusicService
     }
 
     private static async Task<T?> RefreshIfStaleAsync<T>(
-        T? cached,
+        Func<T?> read,
         Func<T, bool> isValid,
         Func<CancellationToken, Task<T?>> refresh,
         SemaphoreSlim gate,
@@ -81,6 +81,7 @@ public class AppleMusicService : IAppleMusicService
         Action<T> set)
         where T : class
     {
+        var cached = read();
         if (cached is not null && isValid(cached))
         {
             return cached;
@@ -89,6 +90,7 @@ public class AppleMusicService : IAppleMusicService
         await gate.WaitAsync(ct);
         try
         {
+            cached = read();
             if (cached is not null && isValid(cached))
             {
                 return cached;
@@ -314,7 +316,7 @@ public class AppleMusicService : IAppleMusicService
     private async Task<string?> FetchDeveloperTokenAsync(CancellationToken ct)
     {
         var cached = await RefreshIfStaleAsync(
-            _devToken,
+            () => _devToken,
             token => !string.IsNullOrWhiteSpace(token.Token) && DateTimeOffset.UtcNow < token.ExpiresAt,
             ScrapeDevTokenAsync,
             _gateDevToken,
