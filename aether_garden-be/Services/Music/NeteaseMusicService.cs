@@ -8,14 +8,14 @@ namespace aether_garden_be.Services.Music;
 public class NeteaseMusicService : INeteaseMusicService
 {
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly IOptionsMonitor<AppleMusicOptions> _options;
+    private readonly IOptionsMonitor<MusicOptions> _options;
     private readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
     private readonly UrlEncoder _urlEncoder = UrlEncoder.Default;
     private readonly SemaphoreSlim _gate = new(1, 1);
 
     private readonly Dictionary<string, CachedSong> _cache = new(StringComparer.OrdinalIgnoreCase);
 
-    public NeteaseMusicService(IHttpClientFactory httpClientFactory, IOptionsMonitor<AppleMusicOptions> options)
+    public NeteaseMusicService(IHttpClientFactory httpClientFactory, IOptionsMonitor<MusicOptions> options)
     {
         _httpClientFactory = httpClientFactory;
         _options = options;
@@ -42,7 +42,7 @@ public class NeteaseMusicService : INeteaseMusicService
 
             if (!string.IsNullOrWhiteSpace(url))
             {
-                var ttl = TimeSpan.FromHours(Math.Max(1, _options.CurrentValue.CacheHours));
+                var ttl = TimeSpan.FromHours(Math.Max(0, _options.CurrentValue.CacheHours));
                 _cache[queryKey] = new CachedSong(url, DateTimeOffset.UtcNow.Add(ttl));
             }
 
@@ -125,6 +125,7 @@ public class NeteaseMusicService : INeteaseMusicService
 
     private sealed record CachedSong(string Url, DateTimeOffset ExpiresAt);
 
+    // Mirror the JSON of the Netease search API (music.163.com/api/search/get/web).
     private sealed class NeteaseSearchResponse
     {
         public NeteaseSearchResult? Result { get; set; }
@@ -137,7 +138,7 @@ public class NeteaseMusicService : INeteaseMusicService
 
     private sealed class NeteaseSong
     {
-        public long Id { get; set; }
+        public long Id { get; set; } // the 163.com song id, used to build the Netease link
         public string Name { get; set; } = string.Empty;
         public List<NeteaseArtist> Artists { get; set; } = [];
     }

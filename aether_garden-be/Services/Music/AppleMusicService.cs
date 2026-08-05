@@ -16,6 +16,8 @@ public class AppleMusicService : IAppleMusicService
         "index-legacy~[A-Za-z0-9~_-]+\\.js",
         RegexOptions.Compiled
     );
+    // Dev token comes from scraping Apple's web bundle at runtime, not from our
+    // own MusicKit credentials — see docs/adr/0001-apple-music-dev-token-scraped-from-web-bundle.md.
     private static readonly Regex PlaylistIdRegex = new(
         "pl\\.[A-Za-z0-9-]+",
         RegexOptions.Compiled | RegexOptions.IgnoreCase
@@ -28,16 +30,19 @@ public class AppleMusicService : IAppleMusicService
     private static readonly Regex PathSongIdRegex = new("/(\\d+)$", RegexOptions.Compiled);
 
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly IOptionsMonitor<AppleMusicOptions> _options;
+    private readonly IOptionsMonitor<MusicOptions> _options;
     private readonly INeteaseMusicService _neteaseMusicService;
-    private readonly SemaphoreSlim _gate = new(1, 1);
+    private readonly SemaphoreSlim _gateFavorite = new(1, 1);
+    private readonly SemaphoreSlim _gateDevToken = new(1, 1);
     private readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
 
     private CachedTracks? _cache;
 
+    private CachedDevToken? _devToken;
+
     public AppleMusicService(
         IHttpClientFactory httpClientFactory,
-        IOptionsMonitor<AppleMusicOptions> options,
+        IOptionsMonitor<MusicOptions> options,
         INeteaseMusicService neteaseMusicService
     )
     {
@@ -46,7 +51,7 @@ public class AppleMusicService : IAppleMusicService
         _neteaseMusicService = neteaseMusicService;
     }
 
-    public async Task<IReadOnlyList<AppleMusicTrack>> GetFavoriteTracksAsync(
+    public async Task<IReadOnlyList<MusicTrack>> GetFavoriteTracksAsync(
         CancellationToken cancellationToken = default
     )
     {
@@ -61,7 +66,7 @@ public class AppleMusicService : IAppleMusicService
             return cached.Tracks;
         }
 
-        await _gate.WaitAsync(cancellationToken);
+        await _gateFavorite.WaitAsync(cancellationToken);
         try
         {
             cached = _cache;
@@ -85,29 +90,29 @@ public class AppleMusicService : IAppleMusicService
         }
         finally
         {
-            _gate.Release();
+            _gateFavorite.Release();
         }
     }
 
-    private async Task<IReadOnlyList<AppleMusicTrack>> FetchTracksAsync(
+    private async Task<IReadOnlyList<MusicTrack>> FetchTracksAsync(
         CancellationToken cancellationToken
     )
     {
         var playlistUrl = _options.CurrentValue.PlaylistUrl?.Trim() ?? string.Empty;
         if (string.IsNullOrWhiteSpace(playlistUrl))
         {
-            return Array.Empty<AppleMusicTrack>();
+            return [];
         }
 
         if (!TryParsePlaylist(playlistUrl, out var storefront, out var playlistId))
         {
-            return Array.Empty<AppleMusicTrack>();
+            return [];
         }
 
         var devToken = await FetchDeveloperTokenAsync(cancellationToken);
         if (string.IsNullOrWhiteSpace(devToken))
         {
-            return Array.Empty<AppleMusicTrack>();
+            return [];
         }
 
         var client = _httpClientFactory.CreateClient();
@@ -123,7 +128,7 @@ public class AppleMusicService : IAppleMusicService
         using var response = await client.SendAsync(request, cancellationToken);
         if (!response.IsSuccessStatusCode)
         {
-            return Array.Empty<AppleMusicTrack>();
+            return [];
         }
 
         await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
@@ -135,42 +140,34 @@ public class AppleMusicService : IAppleMusicService
         var tracks = playlist?.Data?.FirstOrDefault()?.Relationships?.Tracks?.Data;
         if (tracks is null)
         {
-            return Array.Empty<AppleMusicTrack>();
+            return [];
         }
 
         var directTracks = tracks
             .Where(track => track.Attributes is not null)
             .Select(track => track.Attributes!)
             .Where(track => !string.IsNullOrWhiteSpace(track.Name))
+            .Take(_options.CurrentValue.CacheLimit)
             .ToList();
 
         if (directTracks.Count > 0)
         {
             return await BuildTracksWithNeteaseAsync(directTracks, cancellationToken);
         }
-
-        if (playlist?.Included is null)
+        else
         {
-            return Array.Empty<AppleMusicTrack>();
+            return [];
         }
-
-        var includedTracks = playlist
-            .Included.Where(item => item.Type == "songs" && item.Attributes is not null)
-            .Select(item => item.Attributes!)
-            .Where(track => !string.IsNullOrWhiteSpace(track.Name))
-            .ToList();
-
-        return await BuildTracksWithNeteaseAsync(includedTracks, cancellationToken);
     }
 
-    private static AppleMusicTrack ToTrack(TrackAttributes attributes, string neteaseUrl)
+    private static MusicTrack ToTrack(TrackAttributes attributes, string neteaseUrl)
     {
         var artwork = attributes.Artwork?.Url ?? string.Empty;
         var artworkUrl = string.IsNullOrWhiteSpace(artwork)
             ? string.Empty
             : artwork.Replace("{w}", "300").Replace("{h}", "300");
 
-        return new AppleMusicTrack(
+        return new MusicTrack(
             attributes.Name ?? string.Empty,
             attributes.ArtistName ?? string.Empty,
             artworkUrl,
@@ -179,7 +176,7 @@ public class AppleMusicService : IAppleMusicService
         );
     }
 
-    public async Task<AppleMusicTrack?> ResolveSongAsync(
+    public async Task<MusicTrack?> ResolveSongAsync(
         string songUrl,
         CancellationToken cancellationToken = default
     )
@@ -300,24 +297,61 @@ public class AppleMusicService : IAppleMusicService
 
     private async Task<string?> FetchDeveloperTokenAsync(CancellationToken cancellationToken)
     {
-        var client = _httpClientFactory.CreateClient();
-        client.DefaultRequestHeaders.UserAgent.ParseAdd("aether-garden-site");
-
-        var assetUrl = await ResolveDevTokenAssetUrlAsync(client, cancellationToken);
-        if (string.IsNullOrWhiteSpace(assetUrl))
+        var token = _devToken;
+        if (token is not null
+            && !string.IsNullOrWhiteSpace(token.Token)
+            && DateTimeOffset.UtcNow < token.ExpiresAt
+        )
         {
-            return null;
+            return token.Token;
         }
 
-        var response = await client.GetAsync(assetUrl, cancellationToken);
-        if (!response.IsSuccessStatusCode)
-        {
-            return null;
-        }
+        await _gateDevToken.WaitAsync(cancellationToken);
 
-        var js = await response.Content.ReadAsStringAsync(cancellationToken);
-        var match = JwtRegex.Match(js);
-        return match.Success ? match.Value : null;
+        try
+        {
+            token = _devToken;
+            if (token is not null
+                && !string.IsNullOrWhiteSpace(token.Token)
+                && DateTimeOffset.UtcNow < token.ExpiresAt
+            )
+            {
+                return token.Token;
+            }
+
+            var client = _httpClientFactory.CreateClient();
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("aether-garden-site");
+
+            var assetUrl = await ResolveDevTokenAssetUrlAsync(client, cancellationToken);
+            if (string.IsNullOrWhiteSpace(assetUrl))
+            {
+                return null;
+            }
+
+            var response = await client.GetAsync(assetUrl, cancellationToken);
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
+
+            var js = await response.Content.ReadAsStringAsync(cancellationToken);
+            var match = JwtRegex.Match(js);
+
+            if (match.Success)
+            {
+                // TODO: Use ttl encoded in apple api.
+                _devToken = new CachedDevToken(match.Value, DateTimeOffset.UtcNow.Add(TimeSpan.FromHours(24)));
+            }
+            else
+            {
+                _devToken = null;
+            }
+            return _devToken?.Token;
+        }
+        finally
+        {
+            _gateDevToken.Release();
+        }
     }
 
     private async Task<string?> ResolveDevTokenAssetUrlAsync(
@@ -339,28 +373,30 @@ public class AppleMusicService : IAppleMusicService
     private TimeSpan GetCacheTtl()
     {
         var hours = _options.CurrentValue.CacheHours;
-        if (hours <= 0)
-        {
-            hours = 12;
-        }
-
-        return TimeSpan.FromHours(hours);
+        return TimeSpan.FromHours(Math.Max(0, hours));
     }
 
     private sealed record CachedTracks(
-        IReadOnlyList<AppleMusicTrack> Tracks,
+        IReadOnlyList<MusicTrack> Tracks,
         DateTimeOffset ExpiresAt
     );
 
+    private sealed record CachedDevToken(
+        string Token,
+        DateTimeOffset ExpiresAt
+    );
+
+    // Mirror the JSON returned by Apple's private web API (amp-api.music.apple.com).
+    // These classes are never constructed directly — System.Text.Json populates them.
     private sealed class SongResponse
     {
         public List<TrackData>? Data { get; set; }
     }
 
+    // A playlist's direct tracks live under Data[].Relationships.Tracks.Data;
     private sealed class PlaylistResponse
     {
         public List<PlaylistData>? Data { get; set; }
-        public List<TrackData>? Included { get; set; }
     }
 
     private sealed class PlaylistData
@@ -380,6 +416,7 @@ public class AppleMusicService : IAppleMusicService
 
     private sealed class TrackData
     {
+        // Type discriminates what the entry is ("songs" vs. "music-videos", etc.);
         public string? Type { get; set; }
         public TrackAttributes? Attributes { get; set; }
     }
@@ -392,20 +429,21 @@ public class AppleMusicService : IAppleMusicService
         public TrackArtwork? Artwork { get; set; }
     }
 
+    // Artwork.Url is Apple's templated artwork URL with {w}/{h} placeholders;
+    // ToTrack replaces them with concrete pixel sizes.
     private sealed class TrackArtwork
     {
         public string? Url { get; set; }
     }
 
-    private async Task<IReadOnlyList<AppleMusicTrack>> BuildTracksWithNeteaseAsync(
+    private async Task<IReadOnlyList<MusicTrack>> BuildTracksWithNeteaseAsync(
         List<TrackAttributes> tracks,
         CancellationToken cancellationToken
     )
     {
-        var limited = tracks.Take(4).ToList();
-        var results = new List<AppleMusicTrack>(limited.Count);
+        var results = new List<MusicTrack>(tracks.Count);
 
-        foreach (var track in limited)
+        foreach (var track in tracks)
         {
             var neteaseUrl = await _neteaseMusicService.ResolveSongUrlAsync(
                 track.Name ?? string.Empty,

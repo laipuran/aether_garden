@@ -16,7 +16,7 @@ builder.Services.Configure<GithubOptions>(builder.Configuration.GetSection("Gith
 builder.Services.Configure<ContentOptions>(builder.Configuration.GetSection("Content"));
 builder.Services.Configure<InternalAuthOptions>(builder.Configuration.GetSection("InternalAuth"));
 builder.Services.Configure<FeatureOptions>(builder.Configuration.GetSection("Features"));
-builder.Services.Configure<AppleMusicOptions>(builder.Configuration.GetSection("AppleMusic"));
+builder.Services.Configure<MusicOptions>(builder.Configuration.GetSection("Music"));
 
 var frontendOrigins = builder.Configuration
     .GetSection("Cors:AllowedOrigins")
