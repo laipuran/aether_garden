@@ -10,7 +10,7 @@ public class StaticProfileProvider : IProfileProvider
         Bio: "热爱开源，想研究一些有趣的东西。",
         Location: "Hubei, China",
         School: "Wuhan University",
-        Website: "https://duckran.com/",
+        Website: "https://duckran.top/",
         Github: "https://github.com/laipuran",
         Interests: ["同人音乐", "钢琴", "音乐游戏", "C# 和 .NET"],
         ContactEmail: "puranlai@qq.com"
