@@ -6,13 +6,13 @@ public class StaticProfileProvider : IProfileProvider
 {
     private static readonly ProfileModel Profile = new(
         Name: "Duck Ran",
-        Title: "计算机系学生 / Student Builder",
-        Bio: "来自江西，目前在武汉大学学习。偏好做能解决真实问题的小而美应用，也喜欢在学习过程中记录思路与细节。",
-        Location: "Jiangxi, China",
+        Title: "计算机系学生 / CS Student",
+        Bio: "热爱开源，想研究一些有趣的东西。",
+        Location: "Hubei, China",
         School: "Wuhan University",
-        Website: "https://laipuran.github.io/",
+        Website: "https://duckran.com/",
         Github: "https://github.com/laipuran",
-        Interests: ["C# 与 .NET", "Web 全栈开发", "小工具产品化", "算法与数据结构"],
+        Interests: ["同人音乐", "钢琴", "音乐游戏", "C# 和 .NET"],
         ContactEmail: "puranlai@qq.com"
     );
 
