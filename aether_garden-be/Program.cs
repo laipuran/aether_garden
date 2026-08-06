@@ -35,10 +35,11 @@ builder.Services.AddCors(options =>
 builder.Services.AddSingleton<MarkdownContentService>();
 builder.Services.AddSingleton<IContentProvider>(sp => sp.GetRequiredService<MarkdownContentService>());
 builder.Services.AddSingleton<IContentReloadService>(sp => sp.GetRequiredService<MarkdownContentService>());
-builder.Services.AddSingleton<IProfileProvider, StaticProfileProvider>();
-builder.Services.AddSingleton<IGithubOverviewService, GithubOverviewService>();
+builder.Services.AddSingleton<StaticProfileProvider>();
+builder.Services.AddSingleton<GithubOverviewService>();
 builder.Services.AddSingleton<IAppleMusicService, AppleMusicService>();
-builder.Services.AddSingleton<INeteaseMusicService, NeteaseMusicService>();
+builder.Services.AddSingleton<AppleMusicDevTokenProvider>();
+builder.Services.AddSingleton<NeteaseMusicService>();
 
 builder.Services.AddSingleton<IEndpointModule, ProfileModule>();
 builder.Services.AddSingleton<IEndpointModule, BlogModule>();

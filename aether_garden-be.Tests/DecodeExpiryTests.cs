@@ -23,7 +23,7 @@ public sealed class DecodeExpiryTests
     {
         var exp = 1790643483L;
 
-        var result = AppleMusicService.DecodeExpiry(BuildJwt(exp));
+        var result = AppleMusicDevTokenProvider.DecodeExpiry(BuildJwt(exp));
 
         Assert.Equal(DateTimeOffset.FromUnixTimeSeconds(exp), result);
     }

@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 
 namespace aether_garden_be.Services.Music;
 
-public class NeteaseMusicService : INeteaseMusicService
+public class NeteaseMusicService
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IOptionsMonitor<MusicOptions> _options;
