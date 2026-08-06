@@ -403,6 +403,9 @@ export interface components {
             language: string;
             /** Format: int32 */
             stars: number | string;
+            /** Format: int32 */
+            contributions: number | string;
+            isOwned: boolean;
         };
         MusicTrack: {
             name: string;

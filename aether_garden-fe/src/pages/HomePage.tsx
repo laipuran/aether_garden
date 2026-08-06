@@ -100,10 +100,11 @@ export function HomePage() {
                 <li className="list-item" key={repo.name}>
                   <a href={repo.url} target="_blank" rel="noreferrer">
                     <strong>{repo.name}</strong>
+                    {!repo.isOwned && <span className="badge github-repo-tag">外部贡献</span>}
                   </a>
                   <p className="meta">{repo.description || 'No description'}</p>
                   <div className="meta mono">
-                    {repo.language || 'Unknown'} · ★ {repo.stars}
+                    {repo.language || 'Unknown'} · ★ {repo.stars} · 最近 {repo.contributions} 次贡献
                   </div>
                 </li>
               ))}

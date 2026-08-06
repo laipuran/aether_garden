@@ -5,5 +5,7 @@ public record GithubRepo(
     string Description,
     string Url,
     string Language,
-    int Stars
+    int Stars,
+    int Contributions,
+    bool IsOwned
 );

@@ -8,6 +8,6 @@ public record GithubOverview(
     int PublicRepos,
     int Followers,
     int Following,
-    List<GithubRepo> Picked, // the three most recently updated repos
+    List<GithubRepo> Picked, // the repos with the most recent contribution events
     string Source // "github-live" when live, "fallback" when GitHub was unreachable
 );
