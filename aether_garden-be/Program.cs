@@ -11,7 +11,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddHttpClient();
 
-builder.Services.Configure<CorsOptions>(builder.Configuration.GetSection("Cors"));
 builder.Services.Configure<GithubOptions>(builder.Configuration.GetSection("Github"));
 builder.Services.Configure<ContentOptions>(builder.Configuration.GetSection("Content"));
 builder.Services.Configure<InternalAuthOptions>(builder.Configuration.GetSection("InternalAuth"));

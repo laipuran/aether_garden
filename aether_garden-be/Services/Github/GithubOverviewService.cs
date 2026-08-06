@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 
 namespace aether_garden_be.Services.Github;
 
-public class GithubOverviewService : IGithubOverviewService
+public class GithubOverviewService
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IOptionsMonitor<GithubOptions> _options;

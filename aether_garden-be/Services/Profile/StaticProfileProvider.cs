@@ -2,7 +2,7 @@ using ProfileModel = aether_garden_be.Models.Profile;
 
 namespace aether_garden_be.Services.Profile;
 
-public class StaticProfileProvider : IProfileProvider
+public class StaticProfileProvider
 {
     private static readonly ProfileModel Profile = new(
         Name: "Duck Ran",
