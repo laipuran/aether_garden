@@ -1,5 +1,5 @@
-# Apple Music data is fetched via a scraped developer token
+# Apple Music 数据通过抓取的开发者令牌获取
 
-`AppleMusicService` reads playlists and songs from Apple's private web API (`amp-api.music.apple.com`), which demands a `Bearer` token. Instead of registering a MusicKit developer token, we scrape one at runtime: download Apple's web-player JavaScript bundle and extract a JWT from it by regex.
+`AppleMusicService`（具体抓取逻辑在 `AppleMusicDevTokenProvider`）从苹果私有 Web API（`amp-api.music.apple.com`）读取播放列表和歌曲，该 API 要求 `Bearer` 令牌。我们没有注册 MusicKit 开发者令牌，而是在运行时抓取一个：下载苹果 Web 播放器的 JavaScript 包，用正则从其中提取 JWT。
 
-Scraping needs no credentials or Apple account, but is fragile by nature — Apple can move the bundle, change the token format, or block the endpoint at any time. We accept this: on failure the module degrades to empty results (tracks are skipped, conversions return not-found) rather than crashing, and the endpoints are best-effort. If the scraping stops working, the fallback is to generate our own MusicKit token from a registered developer key.
+抓取不需要任何凭据或 Apple 账号，但本质上很脆弱——苹果随时可能移动包文件、改动令牌格式或封禁端点。我们接受这一点：失败时模块降级为空结果（歌曲被跳过，转换返回 not-found）而非崩溃，端点是尽力而为的。若抓取失效，回退方案是从注册的开发者密钥生成我们自己的 MusicKit 令牌。
