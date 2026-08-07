@@ -41,6 +41,19 @@ jobs:
         with:
           dotnet-version: "10.0.x"
 
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Install wasm-pack
+        run: curl -sSf https://rustwasm.github.io/wasm-pack/installer/init.sh | sh
+
+      - name: Build WASM modules
+        working-directory: aether_garden-wasm
+        run: |
+          for c in */; do [ -f "${c}Cargo.toml" ] || continue; wasm-pack build "${c%/}" --target web --release; done
+
       - name: Build frontend
         run: |
           pnpm install --frozen-lockfile

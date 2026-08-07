@@ -6,5 +6,9 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 5173,
+    fs: {
+      // Serve the sibling aether_garden-wasm crate (compiled pkg) in dev.
+      allow: ['..'],
+    },
   },
 })
