@@ -1,0 +1,5 @@
+# Enable SIMD for WASM targets so the Mandelbrot escape kernel can use
+# f64x4 lanes (requires simd128-capable browsers: Chrome 91+, Firefox 89+,
+# Safari 16.4+).
+[target.wasm32-unknown-unknown]
+rustflags = ["-C", "target-feature=+simd128"]
