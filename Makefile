@@ -1,4 +1,4 @@
-.PHONY: gen-api build run-be run-fe
+.PHONY: gen-api build format run-be run-fe
 
 # Regenerate the backend OpenAPI contract and the frontend types derived from it.
 # Rebuild is required so GetDocument always runs (incremental build skips it
@@ -11,6 +11,11 @@ gen-api:
 build:
 	cd aether_garden-be && dotnet build
 	cd aether_garden-fe && pnpm build
+
+# Lint and format both apps.
+format:
+	cd aether_garden-fe && pnpm lint
+	cd aether_garden-be && dotnet format
 
 # Backend dev server (launchSettings -> http://localhost:5109).
 run-be:

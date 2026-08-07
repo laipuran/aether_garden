@@ -421,7 +421,6 @@ export interface components {
             date: string;
             tags: string[];
             markdown: string;
-            content: string[];
         };
         PostSummary: {
             slug: string;

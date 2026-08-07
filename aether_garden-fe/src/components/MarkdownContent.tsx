@@ -187,12 +187,9 @@ const markdownComponents: Components = {
 
 type Props = {
   markdown: string
-  fallbackParagraphs: string[]
 }
 
-export function MarkdownContent({ markdown, fallbackParagraphs }: Props) {
-  const source = markdown.trim() ? markdown : fallbackParagraphs.join('\n\n')
-
+export function MarkdownContent({ markdown }: Props) {
   return (
     <div className="markdown-body">
       <ReactMarkdown
@@ -200,7 +197,7 @@ export function MarkdownContent({ markdown, fallbackParagraphs }: Props) {
         rehypePlugins={[rehypeSanitize]}
         components={markdownComponents}
       >
-        {source}
+        {markdown}
       </ReactMarkdown>
     </div>
   )

@@ -58,7 +58,7 @@ export function NoteDetailPage() {
           {data.date} · {data.tags.join(' / ')}
         </div>
       </header>
-      <MarkdownContent markdown={data.markdown} fallbackParagraphs={data.content} />
+      <MarkdownContent markdown={data.markdown} />
     </article>
   )
 }

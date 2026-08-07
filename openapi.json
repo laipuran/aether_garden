@@ -420,8 +420,7 @@
           "excerpt",
           "date",
           "tags",
-          "markdown",
-          "content"
+          "markdown"
         ],
         "type": "object",
         "properties": {
@@ -445,12 +444,6 @@
           },
           "markdown": {
             "type": "string"
-          },
-          "content": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
           }
         }
       },

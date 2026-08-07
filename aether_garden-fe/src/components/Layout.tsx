@@ -48,8 +48,6 @@ export function Layout() {
       setSystemTheme(event.matches ? 'dark' : 'light')
     }
 
-    setSystemTheme(mediaQuery.matches ? 'dark' : 'light')
-
     if (typeof mediaQuery.addEventListener === 'function') {
       mediaQuery.addEventListener('change', handleChange)
       return () => mediaQuery.removeEventListener('change', handleChange)

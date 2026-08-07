@@ -137,7 +137,6 @@ public class MarkdownContentService : IContentProvider, IContentReloadService
 
         ValidateMetadata(metadata, filePath);
 
-        var paragraphs = ParseParagraphs(body);
         var excerpt = string.IsNullOrWhiteSpace(metadata.Excerpt)
             ? BuildExcerpt(body)
             : metadata.Excerpt.Trim();
@@ -148,8 +147,7 @@ public class MarkdownContentService : IContentProvider, IContentReloadService
             Excerpt: excerpt,
             Date: metadata.Date.Trim(),
             Tags: (metadata.Tags ?? []).Where(tag => !string.IsNullOrWhiteSpace(tag)).Select(tag => tag.Trim()).ToList(),
-            Markdown: body,
-            Content: paragraphs
+            Markdown: body
         );
 
         return new ParsedPost(model, metadata.Status?.Trim() ?? "published");
@@ -193,15 +191,6 @@ public class MarkdownContentService : IContentProvider, IContentReloadService
         frontMatter = normalized[4..markerIndex];
         body = normalized[(markerIndex + 5)..].Trim();
         return true;
-    }
-
-    private static List<string> ParseParagraphs(string markdownBody)
-    {
-        return markdownBody
-            .Split("\n\n", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            .Select(MarkdownBlockToPlainText)
-            .Where(text => !string.IsNullOrWhiteSpace(text))
-            .ToList();
     }
 
     private static string BuildExcerpt(string markdownBody)
