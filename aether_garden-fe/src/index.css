@@ -771,3 +771,177 @@ h1 {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* ── Playground · Mandelbrot ───────────────────────────────── */
+
+.playground {
+  max-width: 46rem;
+}
+
+.mb-body {
+  margin-top: var(--space-4);
+  display: grid;
+  gap: var(--space-4);
+}
+
+.mb-hud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+}
+
+.mb-hud b {
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+.mb-hud b.accent {
+  color: var(--accent-deep);
+}
+
+.mb-canvas-shell {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-elevated);
+  overflow: hidden;
+}
+
+.mb-canvas {
+  display: block;
+  width: 100%;
+  height: 520px;
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+}
+
+.mb-canvas:active {
+  cursor: grabbing;
+}
+
+.mb-loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+  background: var(--glass-strong);
+}
+
+.mb-note {
+  position: absolute;
+  left: var(--space-2);
+  bottom: var(--space-2);
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+  background: var(--glass);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.mb-controls {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--glass-strong);
+}
+
+.mb-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.mb-row-label {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  min-width: 4.5rem;
+}
+
+.mb-row input[type='range'] {
+  flex: 1;
+  min-width: 8rem;
+  accent-color: var(--accent-deep);
+}
+
+.mb-segmented {
+  display: flex;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.mb-segmented button {
+  padding: 0.35rem 0.9rem;
+  border: none;
+  background: var(--surface-elevated);
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.mb-segmented button + button {
+  border-left: 1px solid var(--line);
+}
+
+.mb-segmented button.active {
+  background: var(--accent);
+  color: var(--ink-strong);
+  font-weight: 600;
+}
+
+.mb-button {
+  padding: 0.4rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-elevated);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.mb-button:hover {
+  border-color: var(--accent-deep);
+}
+
+.mb-swatch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.6rem 0.25rem 0.35rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-elevated);
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.mb-swatch.active {
+  border-color: var(--accent-deep);
+  color: var(--ink-strong);
+}
+
+.mb-swatch-bar {
+  width: 1.1rem;
+  height: 0.8rem;
+  border-radius: 4px;
+}
+
+.mb-footnote {
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+  margin: 0;
+}

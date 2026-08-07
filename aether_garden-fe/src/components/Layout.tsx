@@ -5,6 +5,7 @@ const navItems = [
   { to: '/', label: '主页', end: true },
   { to: '/blog', label: '博客' },
   { to: '/notes', label: '随笔' },
+  { to: '/playground', label: 'Playground' },
   { to: '/about', label: '个人介绍' },
 ]
 

@@ -4,6 +4,7 @@ import { AboutPage } from './pages/AboutPage'
 import { BlogDetailPage, BlogPage } from './pages/BlogPage'
 import { HomePage } from './pages/HomePage'
 import { NoteDetailPage, NotesPage } from './pages/NotesPage'
+import { PlaygroundPage } from './pages/PlaygroundPage'
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/blog/:slug" element={<BlogDetailPage />} />
         <Route path="/notes" element={<NotesPage />} />
         <Route path="/notes/:slug" element={<NoteDetailPage />} />
+        <Route path="/playground" element={<PlaygroundPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
