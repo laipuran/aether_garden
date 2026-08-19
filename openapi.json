@@ -78,7 +78,42 @@
         }
       }
     },
-    "/api/notes": {
+    "/api/blog/{slug}/related": {
+      "get": {
+        "tags": [
+          "aether_garden-be"
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelatedContent"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/note": {
       "get": {
         "tags": [
           "aether_garden-be"
@@ -100,7 +135,7 @@
         }
       }
     },
-    "/api/notes/{slug}": {
+    "/api/note/{slug}": {
       "get": {
         "tags": [
           "aether_garden-be"
@@ -122,6 +157,41 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PostDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/note/{slug}/related": {
+      "get": {
+        "tags": [
+          "aether_garden-be"
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelatedContent"
+                  }
                 }
               }
             }
@@ -236,6 +306,12 @@
   },
   "components": {
     "schemas": {
+      "ContentKind": {
+        "enum": [
+          "blog",
+          "note"
+        ]
+      },
       "ContentLoadFailure": {
         "required": [
           "filePath",
@@ -519,6 +595,29 @@
             }
           },
           "contactEmail": {
+            "type": "string"
+          }
+        }
+      },
+      "RelatedContent": {
+        "required": [
+          "kind",
+          "slug",
+          "title",
+          "date"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/ContentKind"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "date": {
             "type": "string"
           }
         }

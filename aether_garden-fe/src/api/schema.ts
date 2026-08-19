@@ -118,7 +118,51 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/notes": {
+    "/api/blog/{slug}/related": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    slug: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["RelatedContent"][];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/note": {
         parameters: {
             query?: never;
             header?: never;
@@ -153,7 +197,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/notes/{slug}": {
+    "/api/note/{slug}": {
         parameters: {
             query?: never;
             header?: never;
@@ -178,6 +222,50 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["PostDetail"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/note/{slug}/related": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    slug: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["RelatedContent"][];
                     };
                 };
                 /** @description Not Found */
@@ -371,6 +459,8 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** @enum {unknown} */
+        ContentKind: "blog" | "note";
         ContentLoadFailure: {
             filePath: string;
             error: string;
@@ -439,6 +529,12 @@ export interface components {
             github: string;
             interests: string[];
             contactEmail: string;
+        };
+        RelatedContent: {
+            kind: components["schemas"]["ContentKind"];
+            slug: string;
+            title: string;
+            date: string;
         };
     };
     responses: never;
