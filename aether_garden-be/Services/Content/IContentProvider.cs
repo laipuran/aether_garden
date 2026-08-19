@@ -8,4 +8,5 @@ public interface IContentProvider
     PostDetail? GetBlogBySlug(string slug);
     IReadOnlyList<PostSummary> GetNotes();
     PostDetail? GetNoteBySlug(string slug);
+    IReadOnlyList<RelatedContent>? GetRelatedContent(ContentKind kind, string slug, int limit);
 }

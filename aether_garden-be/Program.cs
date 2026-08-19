@@ -11,6 +11,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddHttpClient();
 
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter(
+        System.Text.Json.JsonNamingPolicy.CamelCase
+    ));
+});
+
 builder.Services.Configure<GithubOptions>(builder.Configuration.GetSection("Github"));
 builder.Services.Configure<ContentOptions>(builder.Configuration.GetSection("Content"));
 builder.Services.Configure<InternalAuthOptions>(builder.Configuration.GetSection("InternalAuth"));

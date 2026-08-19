@@ -5,4 +5,5 @@ public class ContentOptions
     public string RootPath { get; set; } = "../aether_garden.content";
     public string BlogSubPath { get; set; } = "content/blog";
     public string NotesSubPath { get; set; } = "content/notes";
+    public int RelatedLimit { get; set; } = 4;
 }
