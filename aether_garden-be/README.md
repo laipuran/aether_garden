@@ -54,8 +54,10 @@ Update `appsettings.json` if your frontend is hosted on another domain:
 - `GET /api/profile`
 - `GET /api/blog`
 - `GET /api/blog/{slug}`
-- `GET /api/notes`
-- `GET /api/notes/{slug}`
+- `GET /api/blog/{slug}/related`
+- `GET /api/note`
+- `GET /api/note/{slug}`
+- `GET /api/note/{slug}/related`
 - `GET /api/github/overview`
 - `GET /api/music/favorites`
 - `POST /internal/content/reload` (header: `X-Reload-Token`)

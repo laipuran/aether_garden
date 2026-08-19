@@ -9,8 +9,16 @@ Duck Ran 的个人网站。本上下文覆盖后端提供的内容（Post、Note
 _Avoid_: article, blog entry, content item
 
 **Note**:
-一篇短文 Markdown 条目，通过 `/api/notes` 提供，与 Post 同形。
+一篇短文 Markdown 条目，通过 `/api/note` 提供，与 Post 同形。
 _Avoid_: snippet, short post
+
+**Content kind**:
+Post 或 Note 的类型判别符；值为 `blog`/`note`，作为 `RelatedContent` 的字段，并与 `/api/blog`、`/api/note` 路由段和前端路由对齐。
+_Avoid_: type, contentType
+
+**Related content**:
+与某篇 Post 或 Note 相关的条目列表，跨类型混合（可同时含 Post 与 Note），由 `/api/blog/{slug}/related` 与 `/api/note/{slug}/related` 提供；`RelatedContent` 形状只含 kind、slug、title、date。
+_Avoid_: related posts, recommendations
 
 **Slug**:
 Post 或 Note 的 URL 安全、不区分大小写的标识符，每种内容各自唯一。
