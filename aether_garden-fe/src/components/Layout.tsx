@@ -4,7 +4,7 @@ import { NavLink, Outlet, useLocation } from 'react-router-dom'
 const navItems = [
   { to: '/', label: '主页', end: true },
   { to: '/blog', label: '博客' },
-  { to: '/notes', label: '随笔' },
+  { to: '/note', label: '随笔' },
   { to: '/about', label: '个人介绍' },
 ]
 

@@ -437,6 +437,84 @@ h1 {
   padding: var(--space-4);
 }
 
+.reading {
+  max-width: 1080px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 700px) minmax(0, 1fr);
+  gap: var(--space-5);
+  align-items: start;
+}
+
+.article-rail {
+  position: sticky;
+  top: var(--space-5);
+  display: grid;
+  gap: var(--space-4);
+  align-self: start;
+}
+
+.rail-block {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface-elevated);
+  padding: var(--space-3);
+}
+
+.rail-title {
+  font-family: var(--font-code);
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: var(--space-2);
+}
+
+.toc-list,
+.related-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.toc-item {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.toc-item.toc-level-3 {
+  margin-left: var(--space-2);
+}
+
+.toc-item a {
+  color: var(--ink-soft);
+  transition: color 0.2s ease;
+}
+
+.toc-item a:hover {
+  color: var(--link);
+}
+
+.related-list li {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.related-list a {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  transition: color 0.2s ease;
+}
+
+.related-list a:hover {
+  color: var(--link);
+}
+
 .article-body {
   margin-top: var(--space-4);
   display: grid;
@@ -741,6 +819,18 @@ h1 {
 
   .github-overview-content {
     min-height: 22rem;
+  }
+
+  .reading {
+    grid-template-columns: 1fr;
+  }
+
+  .article-rail {
+    position: static;
+  }
+
+  .rail-toc {
+    display: none;
   }
 
   .markdown-body pre {

@@ -38,7 +38,7 @@ export function HomePage() {
             badge="Blog"
           />
           <EntryCard
-            to="/notes"
+            to="/note"
             label="短想法与片段"
             title="随笔"
             badge="Notes"

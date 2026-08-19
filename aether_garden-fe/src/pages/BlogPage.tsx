@@ -1,7 +1,9 @@
-import { useCallback } from 'react'
+import { useCallback, useRef } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { api } from '../api'
+import { ArticleRail } from '../components/ArticleRail'
 import { MarkdownContent } from '../components/MarkdownContent'
+import { useArticleToc } from '../hooks/useArticleToc'
 import { useLoadable } from '../hooks/useLoadable'
 
 export function BlogPage() {
@@ -40,6 +42,10 @@ export function BlogDetailPage() {
   const { slug = '' } = useParams()
   const loadBlog = useCallback(() => api.getBlogBySlug(slug), [slug])
   const { data, loading, error } = useLoadable(loadBlog)
+  const loadRelated = useCallback(() => api.getRelatedContent('blog', slug), [slug])
+  const related = useLoadable(loadRelated)
+  const articleRef = useRef<HTMLElement | null>(null)
+  const headings = useArticleToc(articleRef, data?.markdown ?? '')
 
   if (loading) {
     return <p className="status">正在加载文章...</p>
@@ -50,15 +56,18 @@ export function BlogDetailPage() {
   }
 
   return (
-    <article className="article">
-      <header className="article-header">
-        <div className="eyebrow">Blog Article</div>
-        <h1>{data.title}</h1>
-        <div className="meta mono">
-          {data.date} · {data.tags.join(' / ')}
-        </div>
-      </header>
-      <MarkdownContent markdown={data.markdown} />
-    </article>
+    <div className="reading">
+      <article className="article" ref={articleRef}>
+        <header className="article-header">
+          <div className="eyebrow">Blog Article</div>
+          <h1>{data.title}</h1>
+          <div className="meta mono">
+            {data.date} · {data.tags.join(' / ')}
+          </div>
+        </header>
+        <MarkdownContent markdown={data.markdown} />
+      </article>
+      <ArticleRail headings={headings} related={related.data ?? []} />
+    </div>
   )
 }

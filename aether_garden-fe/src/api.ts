@@ -4,6 +4,7 @@ import type {
   PostDetail,
   PostSummary,
   Profile,
+  RelatedContent,
 } from './types'
 
 const baseUrl =
@@ -22,9 +23,11 @@ export const api = {
   getBlogs: () => fetchJson<PostSummary[]>('/blog'),
   getBlogBySlug: (slug: string) =>
     fetchJson<PostDetail>(`/blog/${encodeURIComponent(slug)}`),
-  getNotes: () => fetchJson<PostSummary[]>('/notes'),
+  getNotes: () => fetchJson<PostSummary[]>('/note'),
   getNoteBySlug: (slug: string) =>
-    fetchJson<PostDetail>(`/notes/${encodeURIComponent(slug)}`),
+    fetchJson<PostDetail>(`/note/${encodeURIComponent(slug)}`),
+  getRelatedContent: (kind: 'blog' | 'note', slug: string) =>
+    fetchJson<RelatedContent[]>(`/${kind}/${encodeURIComponent(slug)}/related`),
   getGithubOverview: () => fetchJson<GithubOverview>('/github/overview'),
   getAppleMusicFavorites: () => fetchJson<MusicTrack[]>('/music/favorites'),
 }

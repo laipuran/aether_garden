@@ -1,7 +1,9 @@
-import { useCallback } from 'react'
+import { useCallback, useRef } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { api } from '../api'
+import { ArticleRail } from '../components/ArticleRail'
 import { MarkdownContent } from '../components/MarkdownContent'
+import { useArticleToc } from '../hooks/useArticleToc'
 import { useLoadable } from '../hooks/useLoadable'
 
 export function NotesPage() {
@@ -22,7 +24,7 @@ export function NotesPage() {
       <ul className="list">
         {data?.map((note) => (
           <li className="list-item" key={note.slug}>
-            <Link to={`/notes/${note.slug}`}>
+            <Link to={`/note/${note.slug}`}>
               <strong>{note.title}</strong>
             </Link>
             <p className="meta">{note.excerpt}</p>
@@ -40,6 +42,10 @@ export function NoteDetailPage() {
   const { slug = '' } = useParams()
   const loadNote = useCallback(() => api.getNoteBySlug(slug), [slug])
   const { data, loading, error } = useLoadable(loadNote)
+  const loadRelated = useCallback(() => api.getRelatedContent('note', slug), [slug])
+  const related = useLoadable(loadRelated)
+  const articleRef = useRef<HTMLElement | null>(null)
+  const headings = useArticleToc(articleRef, data?.markdown ?? '')
 
   if (loading) {
     return <p className="status">正在加载随笔...</p>
@@ -50,15 +56,18 @@ export function NoteDetailPage() {
   }
 
   return (
-    <article className="article">
-      <header className="article-header">
-        <div className="eyebrow">Note</div>
-        <h1>{data.title}</h1>
-        <div className="meta mono">
-          {data.date} · {data.tags.join(' / ')}
-        </div>
-      </header>
-      <MarkdownContent markdown={data.markdown} />
-    </article>
+    <div className="reading">
+      <article className="article" ref={articleRef}>
+        <header className="article-header">
+          <div className="eyebrow">Note</div>
+          <h1>{data.title}</h1>
+          <div className="meta mono">
+            {data.date} · {data.tags.join(' / ')}
+          </div>
+        </header>
+        <MarkdownContent markdown={data.markdown} />
+      </article>
+      <ArticleRail headings={headings} related={related.data ?? []} />
+    </div>
   )
 }
