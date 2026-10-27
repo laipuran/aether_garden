@@ -22,6 +22,11 @@ public class AppleMusicService : IAppleMusicService
     );
     private static readonly Regex AlbumSongIdRegex = new("[?&]i=(\\d+)", RegexOptions.Compiled);
     private static readonly Regex PathSongIdRegex = new("/(\\d+)$", RegexOptions.Compiled);
+    private static readonly Uri AppleMusicOrigin = new("https://music.apple.com/");
+    private static readonly Regex ScriptSourceRegex = new(
+        """<script\b[^>]*\bsrc\s*=\s*["'](?<src>[^"']+)["']""",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase
+    );
 
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IOptionsMonitor<AppleMusicOptions> _options;
@@ -298,18 +303,42 @@ public class AppleMusicService : IAppleMusicService
     {
         var client = _httpClientFactory.CreateClient();
         client.DefaultRequestHeaders.UserAgent.ParseAdd("aether-garden-site");
-        var response = await client.GetAsync(
-            "https://music.apple.com/assets/index-legacy~0484eb127f.js",
-            cancellationToken
-        );
-        if (!response.IsSuccessStatusCode)
+        using var pageResponse = await client.GetAsync(AppleMusicOrigin, cancellationToken);
+        if (!pageResponse.IsSuccessStatusCode)
         {
             return null;
         }
 
-        var js = await response.Content.ReadAsStringAsync(cancellationToken);
-        var match = JwtRegex.Match(js);
-        return match.Success ? match.Value : null;
+        // Apple rotates the entry bundle and its developer token. Discover it from
+        // the live page rather than retaining a versioned asset with an expired JWT.
+        var html = await pageResponse.Content.ReadAsStringAsync(cancellationToken);
+        var pageUri = pageResponse.RequestMessage?.RequestUri ?? AppleMusicOrigin;
+        var scripts = ScriptSourceRegex.Matches(html)
+            .Select(match => Uri.TryCreate(pageUri, match.Groups["src"].Value, out var uri) ? uri : null)
+            .Where(uri => uri is not null
+                && uri.Scheme == AppleMusicOrigin.Scheme
+                && uri.Authority == AppleMusicOrigin.Authority
+                && uri.AbsolutePath.StartsWith("/assets/index", StringComparison.Ordinal)
+                && uri.AbsolutePath.EndsWith(".js", StringComparison.Ordinal))
+            .Distinct();
+
+        foreach (var script in scripts)
+        {
+            using var response = await client.GetAsync(script, cancellationToken);
+            if (!response.IsSuccessStatusCode)
+            {
+                continue;
+            }
+
+            var js = await response.Content.ReadAsStringAsync(cancellationToken);
+            var match = JwtRegex.Match(js);
+            if (match.Success)
+            {
+                return match.Value;
+            }
+        }
+
+        return null;
     }
 
     private TimeSpan GetCacheTtl()

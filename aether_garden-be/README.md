@@ -58,6 +58,7 @@ Update `appsettings.json` if your frontend is hosted on another domain:
 - `GET /api/notes/{slug}`
 - `GET /api/github/overview`
 - `GET /api/music/favorites`
+- `GET /api/music/convert?url=<URL-encoded Apple Music song URL>`
 - `POST /internal/content/reload` (header: `X-Reload-Token`)
 
 ## Apple Music
@@ -72,3 +73,19 @@ Configure a playlist URL and cache window in `appsettings.json`:
 ```
 
 The backend resolves Netease song links via the public web search endpoint and caches results.
+
+The Apple developer token is discovered from the current Apple Music page's entry
+bundle, so rotating asset filenames do not require a code change.
+
+## Music regression tests
+
+```bash
+dotnet test ../aether_garden-be.Tests
+```
+
+Live conversion smoke test (run with the backend listening on port 5109):
+
+```bash
+curl --fail-with-body --get 'http://localhost:5109/api/music/convert' \
+  --data-urlencode 'url=https://music.apple.com/cn/album/flo-lo/1731112820?i=1731112829&ls'
+```
