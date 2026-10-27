@@ -11,12 +11,18 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddHttpClient();
 
-builder.Services.Configure<CorsOptions>(builder.Configuration.GetSection("Cors"));
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter(
+        System.Text.Json.JsonNamingPolicy.CamelCase
+    ));
+});
+
 builder.Services.Configure<GithubOptions>(builder.Configuration.GetSection("Github"));
 builder.Services.Configure<ContentOptions>(builder.Configuration.GetSection("Content"));
 builder.Services.Configure<InternalAuthOptions>(builder.Configuration.GetSection("InternalAuth"));
 builder.Services.Configure<FeatureOptions>(builder.Configuration.GetSection("Features"));
-builder.Services.Configure<AppleMusicOptions>(builder.Configuration.GetSection("AppleMusic"));
+builder.Services.Configure<MusicOptions>(builder.Configuration.GetSection("Music"));
 
 var frontendOrigins = builder.Configuration
     .GetSection("Cors:AllowedOrigins")
@@ -35,10 +41,11 @@ builder.Services.AddCors(options =>
 builder.Services.AddSingleton<MarkdownContentService>();
 builder.Services.AddSingleton<IContentProvider>(sp => sp.GetRequiredService<MarkdownContentService>());
 builder.Services.AddSingleton<IContentReloadService>(sp => sp.GetRequiredService<MarkdownContentService>());
-builder.Services.AddSingleton<IProfileProvider, StaticProfileProvider>();
-builder.Services.AddSingleton<IGithubOverviewService, GithubOverviewService>();
+builder.Services.AddSingleton<StaticProfileProvider>();
+builder.Services.AddSingleton<GithubOverviewService>();
 builder.Services.AddSingleton<IAppleMusicService, AppleMusicService>();
-builder.Services.AddSingleton<INeteaseMusicService, NeteaseMusicService>();
+builder.Services.AddSingleton<AppleMusicDevTokenProvider>();
+builder.Services.AddSingleton<NeteaseMusicService>();
 
 builder.Services.AddSingleton<IEndpointModule, ProfileModule>();
 builder.Services.AddSingleton<IEndpointModule, BlogModule>();

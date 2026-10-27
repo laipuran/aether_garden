@@ -3,6 +3,7 @@ import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import type { Components } from 'react-markdown'
 import rehypeSanitize from 'rehype-sanitize'
+import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
 import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter'
 import bash from 'react-syntax-highlighter/dist/esm/languages/prism/bash'
@@ -187,20 +188,17 @@ const markdownComponents: Components = {
 
 type Props = {
   markdown: string
-  fallbackParagraphs: string[]
 }
 
-export function MarkdownContent({ markdown, fallbackParagraphs }: Props) {
-  const source = markdown.trim() ? markdown : fallbackParagraphs.join('\n\n')
-
+export function MarkdownContent({ markdown }: Props) {
   return (
     <div className="markdown-body">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeSanitize]}
+        rehypePlugins={[rehypeSlug, rehypeSanitize]}
         components={markdownComponents}
       >
-        {source}
+        {markdown}
       </ReactMarkdown>
     </div>
   )

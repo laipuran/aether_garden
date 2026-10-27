@@ -12,8 +12,8 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/blog" element={<BlogPage />} />
         <Route path="/blog/:slug" element={<BlogDetailPage />} />
-        <Route path="/notes" element={<NotesPage />} />
-        <Route path="/notes/:slug" element={<NoteDetailPage />} />
+        <Route path="/note" element={<NotesPage />} />
+        <Route path="/note/:slug" element={<NoteDetailPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>

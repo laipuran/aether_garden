@@ -1,12 +1,13 @@
 using System.Net;
 using System.Text.RegularExpressions;
-using PostModel = aether_garden_be.Models.PostDetail;
-using PostSummaryModel = aether_garden_be.Models.PostSummary;
+using aether_garden_be.Models;
 using aether_garden_be.Options;
 using Markdig;
 using Microsoft.Extensions.Options;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
+using PostModel = aether_garden_be.Models.PostDetail;
+using PostSummaryModel = aether_garden_be.Models.PostSummary;
 
 namespace aether_garden_be.Services.Content;
 
@@ -32,6 +33,16 @@ public class MarkdownContentService : IContentProvider, IContentReloadService
             .Build();
     }
 
+    internal MarkdownContentService(
+        IReadOnlyList<PostModel> blogs,
+        IReadOnlyList<PostModel> notes,
+        IOptionsMonitor<ContentOptions> options,
+        ILogger<MarkdownContentService> logger)
+        : this(options, logger)
+    {
+        _snapshot = new ContentSnapshot(blogs.ToList(), notes.ToList());
+    }
+
     public IReadOnlyList<PostSummaryModel> GetBlogs() => _snapshot.Blogs.Select(PostModel.ToSummary).ToList();
 
     public PostModel? GetBlogBySlug(string slug) =>
@@ -41,6 +52,53 @@ public class MarkdownContentService : IContentProvider, IContentReloadService
 
     public PostModel? GetNoteBySlug(string slug) =>
         _snapshot.Notes.FirstOrDefault(post => post.Slug.Equals(slug, StringComparison.OrdinalIgnoreCase));
+
+    public IReadOnlyList<RelatedContent>? GetRelatedContent(ContentKind kind, string slug, int limit)
+    {
+        var current = FindByKind(kind, slug);
+        if (current is null)
+        {
+            return null;
+        }
+
+        return SelectRelated(CatalogWithKind(), current, kind, limit);
+    }
+
+    private PostModel? FindByKind(ContentKind kind, string slug) =>
+        kind == ContentKind.Blog
+            ? _snapshot.Blogs.FirstOrDefault(post => post.Slug.Equals(slug, StringComparison.OrdinalIgnoreCase))
+            : _snapshot.Notes.FirstOrDefault(post => post.Slug.Equals(slug, StringComparison.OrdinalIgnoreCase));
+
+    private IEnumerable<(PostModel Item, ContentKind Kind)> CatalogWithKind() =>
+        _snapshot.Blogs.Select(item => (item, ContentKind.Blog))
+            .Concat(_snapshot.Notes.Select(item => (item, ContentKind.Note)));
+
+    internal static IReadOnlyList<RelatedContent> SelectRelated(
+        IEnumerable<(PostModel Item, ContentKind Kind)> catalog,
+        PostModel current,
+        ContentKind currentKind,
+        int limit
+    )
+    {
+        var currentTags = new HashSet<string>(current.Tags, StringComparer.OrdinalIgnoreCase);
+
+        return catalog
+            .Where(entry =>
+                !(entry.Kind == currentKind && entry.Item.Slug.Equals(current.Slug, StringComparison.OrdinalIgnoreCase))
+            )
+            .Select(entry => new
+            {
+                entry.Item,
+                entry.Kind,
+                Overlap = entry.Item.Tags.Count(tag => currentTags.Contains(tag)),
+            })
+            .Where(entry => entry.Overlap > 0)
+            .OrderByDescending(entry => entry.Overlap)
+            .ThenByDescending(entry => ParseDateOrDefault(entry.Item.Date))
+            .Take(limit)
+            .Select(entry => new RelatedContent(entry.Kind, entry.Item.Slug, entry.Item.Title, entry.Item.Date))
+            .ToList();
+    }
 
     public async Task<ContentReloadResult> ReloadAsync(CancellationToken cancellationToken = default)
     {
@@ -137,7 +195,6 @@ public class MarkdownContentService : IContentProvider, IContentReloadService
 
         ValidateMetadata(metadata, filePath);
 
-        var paragraphs = ParseParagraphs(body);
         var excerpt = string.IsNullOrWhiteSpace(metadata.Excerpt)
             ? BuildExcerpt(body)
             : metadata.Excerpt.Trim();
@@ -148,8 +205,7 @@ public class MarkdownContentService : IContentProvider, IContentReloadService
             Excerpt: excerpt,
             Date: metadata.Date.Trim(),
             Tags: (metadata.Tags ?? []).Where(tag => !string.IsNullOrWhiteSpace(tag)).Select(tag => tag.Trim()).ToList(),
-            Markdown: body,
-            Content: paragraphs
+            Markdown: body
         );
 
         return new ParsedPost(model, metadata.Status?.Trim() ?? "published");
@@ -195,15 +251,6 @@ public class MarkdownContentService : IContentProvider, IContentReloadService
         return true;
     }
 
-    private static List<string> ParseParagraphs(string markdownBody)
-    {
-        return markdownBody
-            .Split("\n\n", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            .Select(MarkdownBlockToPlainText)
-            .Where(text => !string.IsNullOrWhiteSpace(text))
-            .ToList();
-    }
-
     private static string BuildExcerpt(string markdownBody)
     {
         var plain = MarkdownBlockToPlainText(markdownBody);
@@ -228,6 +275,8 @@ public class MarkdownContentService : IContentProvider, IContentReloadService
         public static ContentSnapshot Empty { get; } = new([], []);
     }
 
+    // Maps the YAML front matter of a content file. Status decides whether the
+    // entry is served: only "published" files are kept.
     private record PostFrontMatter
     {
         public string Slug { get; init; } = string.Empty;

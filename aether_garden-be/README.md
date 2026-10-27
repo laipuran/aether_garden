@@ -54,8 +54,10 @@ Update `appsettings.json` if your frontend is hosted on another domain:
 - `GET /api/profile`
 - `GET /api/blog`
 - `GET /api/blog/{slug}`
-- `GET /api/notes`
-- `GET /api/notes/{slug}`
+- `GET /api/blog/{slug}/related`
+- `GET /api/note`
+- `GET /api/note/{slug}`
+- `GET /api/note/{slug}/related`
 - `GET /api/github/overview`
 - `GET /api/music/favorites`
 - `GET /api/music/convert?url=<URL-encoded Apple Music song URL>`
@@ -66,7 +68,7 @@ Update `appsettings.json` if your frontend is hosted on another domain:
 Configure a playlist URL and cache window in `appsettings.json`:
 
 ```json
-"AppleMusic": {
+"Music": {
   "PlaylistUrl": "https://music.apple.com/cn/playlist/favorite-songs/pl.u-GPUoM8yJW1",
   "CacheHours": 12
 }

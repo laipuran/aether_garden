@@ -1,4 +1,6 @@
 using System.Net;
+using System.Text;
+using System.Text.Json;
 using aether_garden_be.Options;
 using aether_garden_be.Services.Music;
 using Microsoft.Extensions.Options;
@@ -9,7 +11,12 @@ namespace aether_garden_be.Tests;
 public class AppleMusicServiceTests
 {
     private const string SongUrl = "https://music.apple.com/cn/album/flo-lo/1731112820?i=1731112829&ls";
-    private const string Token = "eyJtestheader123.testpayload123.testsignature123";
+    private static readonly string Token = "eyJtestheader123."
+        + Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new
+        {
+            exp = DateTimeOffset.UtcNow.AddHours(1).ToUnixTimeSeconds()
+        }))).TrimEnd('=').Replace('+', '-').Replace('/', '_')
+        + ".testsignature123";
 
     [Theory]
     [InlineData("/assets/index~new-version.js")]
@@ -30,6 +37,20 @@ public class AppleMusicServiceTests
         Assert.Equal("https://example.com/300x300.jpg", track.ArtworkUrl);
         Assert.Contains(new Uri(new Uri("https://music.apple.com/"), asset).AbsoluteUri, handler.Requests);
         Assert.DoesNotContain(handler.Requests, url => url.Contains("0484eb127f"));
+    }
+
+    [Fact]
+    public async Task RepeatedConversionsReuseCachedDeveloperToken()
+    {
+        using var handler = new AppleHandler("<script src='/assets/index~new-version.js'></script>");
+        using var client = new HttpClient(handler);
+        var service = CreateService(client);
+
+        Assert.NotNull(await service.ResolveSongAsync(SongUrl));
+        Assert.NotNull(await service.ResolveSongAsync(SongUrl));
+
+        Assert.Equal(1, handler.Requests.Count(url => url == "https://music.apple.com/"));
+        Assert.Equal(1, handler.Requests.Count(url => url.Contains("/assets/")));
     }
 
     [Fact]
@@ -67,11 +88,12 @@ public class AppleMusicServiceTests
     private static AppleMusicService CreateService(HttpClient client)
     {
         var factory = new ClientFactory(client);
-        var options = new StaticOptions(new AppleMusicOptions
+        var options = new StaticOptions(new MusicOptions
         {
             PlaylistUrl = "https://music.apple.com/cn/playlist/test/pl.test"
         });
-        return new AppleMusicService(factory, options, new NeteaseMusicService(factory, options));
+        return new AppleMusicService(factory, options, new NeteaseMusicService(factory, options),
+            new AppleMusicDevTokenProvider(factory));
     }
 
     private sealed class AppleHandler(string html) : HttpMessageHandler
@@ -126,10 +148,10 @@ public class AppleMusicServiceTests
         public HttpClient CreateClient(string name) => client;
     }
 
-    private sealed class StaticOptions(AppleMusicOptions value) : IOptionsMonitor<AppleMusicOptions>
+    private sealed class StaticOptions(MusicOptions value) : IOptionsMonitor<MusicOptions>
     {
-        public AppleMusicOptions CurrentValue => value;
-        public AppleMusicOptions Get(string? name) => value;
-        public IDisposable? OnChange(Action<AppleMusicOptions, string?> listener) => null;
+        public MusicOptions CurrentValue => value;
+        public MusicOptions Get(string? name) => value;
+        public IDisposable? OnChange(Action<MusicOptions, string?> listener) => null;
     }
 }
